@@ -1,39 +1,81 @@
-const Joi = require('joi')
-const {insert, find, collections, deleteTempPassword, update} = require('../common/mongo')
-const lambdaReponse = require('../common/lambdaResponse').lambdaReponse
-const COLLECTION = mongodb.collections
-const bcrypt = require('bcryptjs');
-const Boom = require('boom')
-const cryptoRandomString = require('crypto-random-string');
-const setTempPassword = require('../common/setTempPassword').setTempPassword
-const { v4: uuidv4, v5: uuidv5 } = require('uuid');
-const createUserValidator = {
-    firstName: Joi.string().min(2),
-    lastName: Joi.string().min(2),
-    email: Joi.string().email({minDomainAtoms:2}),
-    phone: Joi.string().required(),
-    location:Joi.object(),
-    social:Joi.array(),
-    idsBase64:Joi.array(),
-    position:Joi.string(),
-    experience:Joi.string(),
-    gender: Joi.string().valid("male", "female")
-}
-module.exports.handler = async (event) => {
-    const userId = event.pathParameters.user_id
-    const body = JSON.parse(event.body)
-    const result = Joi.validate(body, createUserValidator)
-    if (typeof obj !== 'object' || result.error) {
-        return lambdaReponse(Boom.badRequest(result.error))
-    }
-    const user = result.value
-    const usersFromDb = await find(collections.users, {_id:userId})
-    if(!usersFromDb[0].position && user.position){
-        await addUserToTeamRequest(user.position, userId)
-    }
-    await update(collections.teams, {_id:teamId}, user)
+const Joi = require("joi");
+const { collections, update } = require("../common/mongo");
+const lambdaReponse = require("../common/lambdaResponse").lambdaReponse;
+const Boom = require("boom");
+const {
+  S3Client,
+  PutObjectCommand,
+  ObjectCannedACL,
+  PutObjectCommandInput,
+} = require("@aws-sdk/client-s3"); // ES Modules import
 
-    return lambdaReponse({_id:teamId, ...team})
-    
-  };
-  
+const endpoint = process.env.R2_ENDPOINT;
+const accessKeyId = process.env.R2_ACCESS_ID;
+const secretAccessKey = process.env.R2_ACCESS_SECRET;
+const bucket = process.env.R2_BUCKET;
+const S3 = new S3Client({
+  endpoint,
+  credentials: { accessKeyId, secretAccessKey },
+  region: "auto",
+});
+const { isLoggedIn } = require("../common/auth");
+const { last } = require("underscore");
+
+module.exports.handler = async (event) => {
+  const jwt = await isLoggedIn(event);
+  if (!jwt) return lambdaReponse(Boom.unauthorized());
+
+  const userId = event.pathParameters.user_id;
+  const body = JSON.parse(event.body);
+
+  for (let item in body) {
+    const key = body[item];
+    if (typeof key === "object") {
+      for (let i in key) {
+        const item = key[i];
+        if (item.dataURL) {
+          const Key = `${userId}/ids/${item._id}`;
+          const obj = {
+            ACL: ObjectCannedACL.private,
+            Body: Buffer.from(last(item.dataURL.split("base64,")), "base64"),
+            Bucket: bucket,
+            Key,
+            ContentEncoding: "base64",
+            ContentType: item.mime,
+            Metadata: {
+              mime: item.mime,
+              size: item.size,
+              filename: item.filename,
+            },
+          };
+
+          const command = new PutObjectCommand({
+            ACL: ObjectCannedACL.private,
+            Body: Buffer.from(last(item.dataURL.split("base64,")), "base64"),
+            Bucket: bucket,
+            Key,
+            ContentEncoding: "base64",
+            ContentType: item.mime,
+            Metadata: {
+              mime: item.mime,
+              size: "" + item.size,
+              filename: item.filename,
+            },
+          });
+          const response = await S3.send(command);
+          delete response.$metadata;
+          delete key[item._id].dataURL;
+          key[item._id] = {
+            ...key[item._id],
+            ...response,
+            key: Key,
+          };
+        }
+      }
+    }
+  }
+
+  await update(collections.users, { _id: userId }, body);
+
+  return lambdaReponse({ _id: userId, ...body }, 201);
+};

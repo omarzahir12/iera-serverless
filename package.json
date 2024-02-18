@@ -12,12 +12,16 @@
     "serverless-offline": "^13.3.2"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.515.0",
+    "@sendgrid/mail": "^8.1.0",
     "bcryptjs": "^2.4.3",
     "boom": "^7.3.0",
     "crypto-random-string": "^5.0.0",
     "joi": "^17.11.0",
     "joi-jwt": "^1.0.1",
+    "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.3.0",
+    "underscore": "^1.13.6",
     "uuid": "^9.0.1"
   }
 }

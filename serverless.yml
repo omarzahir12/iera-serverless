@@ -8,10 +8,15 @@ provider:
   stage: ${opt:stage, 'dev'}
   memorySize: 128
   environment:
-    MONGO_URI: mongodb://ieraMongo:rbDu6inMs99ARg@127.0.0.1:27018
+    MONGO_URI: ${ssm:/mongo_db}
+    SENGRID: ${ssm:/sendgrid}
+    PRIVATE_KEY: ${ssm:/private_key}
+    PUBLIC_KEY: ${ssm:/public_key}
+    R2_ACCESS_ID: ${ssm:/r2_access_id}
+    R2_ACCESS_SECRET: ${ssm:/r2_access_secret}
+    R2_ENDPOINT: https://b9068f786c3dc33c2c4b3cac9a1638cd.r2.cloudflarestorage.com
+    R2_BUCKET: iera-canada-ids
   
-
-
 functions:
   #open
   login:
@@ -20,6 +25,12 @@ functions:
       - httpApi:
           path: /login
           method: post
+  auth:
+    handler: src/users/login.auth
+    events:
+      - httpApi:
+          path: /auth
+          method: get
   #open
   register:
     handler: src/users/create.handler
@@ -121,5 +132,11 @@ functions:
       - httpApi:
           path: /teams/{team_id}/events/{event_id}
           method: put
+  getFormTemplate:
+    handler: src/forms/forms.getTemplate
+    events:
+      - httpApi:
+          path: /forms/{form_id}
+          method: get
 plugins:
   - serverless-offline
