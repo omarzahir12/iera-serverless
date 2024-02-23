@@ -39,11 +39,23 @@ functions:
           path: /users
           method: post
   #secured, owner, lead, admin TODO
+  getUsers:
+    handler: src/users/get.handler
+    events:
+      - httpApi:
+          path: /users
+          method: get
   getUser:
     handler: src/users/getUser.handler
     events:
       - httpApi:
           path: /users/{user_id}
+          method: get
+  getUserImage:
+    handler: src/users/updateUser.getImage
+    events:
+      - httpApi:
+          path: /users/{user_id}/ids/{image_id}
           method: get
   #secured, owner, lead, admin 
   updateUser:
@@ -137,6 +149,24 @@ functions:
     events:
       - httpApi:
           path: /forms/{form_id}
+          method: get
+  createReport:
+    handler: src/reports/report.create
+    events:
+      - httpApi:
+          path: /reports/{type}/{_id}
+          method: post
+  getReports:
+    handler: src/reports/report.gets
+    events:
+      - httpApi:
+          path: /reports/{type}/{_id}
+          method: get
+  getReport:
+    handler: src/reports/report.get
+    events:
+      - httpApi:
+          path: /reports/{type}/{_id}/{report_id}
           method: get
 plugins:
   - serverless-offline

@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { insert, find, collections } = require("./mongo");
 
 const parseCookie = (str) => {
   if (str)
@@ -23,16 +24,21 @@ function getAuthToken(req) {
     ? authorization.replace("Bearer ", "")
     : null;
 }
-module.exports.isLoggedIn = (req, callback) => {
+module.exports.isLoggedIn = async (req, fromDB) => {
   const token = getAuthToken(req);
   if (token) {
     const decoded = jwt.verify(token, process.env.PUBLIC_KEY, {
       algorithm: "RS256",
       audience: "iera.ca",
     });
-    console.log({ decoded });
+    /*if (fromDB) {
+      const users = await find(collections.users, { _id: decoded._id });
+      console.log({ users });
+      return users[0];
+    }*/
     return decoded;
   } else {
+    console.log("no token");
     return false;
   }
 };

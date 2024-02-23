@@ -1,28 +1,19 @@
-const Joi = require('joi')
-const {insert, find, collections, deleteTempPassword} = require('../common/mongo')
-const lambdaReponse = require('../common/lambdaResponse').lambdaReponse
-const COLLECTION = mongodb.collections
-const bcrypt = require('bcryptjs');
-const Boom = require('boom')
-const cryptoRandomString = require('crypto-random-string');
-const setTempPassword = require('../common/setTempPassword').setTempPassword
-const { v4: uuidv4, v5: uuidv5 } = require('uuid');
-const createTeamValidator = {
-    name: Joi.string().required(),
-    description:Joi.string().required(),
-    status:Joi.string().valid('active', 'inactive').default('active')
-}
-module.exports.handler = async (event) => {
-    const body = JSON.parse(event.body)
-    const result = Joi.validate(body, createTeamValidator)
-    if (typeof obj !== 'object' || result.error) {
-        return lambdaReponse(Boom.badRequest(result.error))
-    }
-    const team = result.value
-    team._id = uuidv4()
-    const tresponse = await insert(collections.teams, team)
+const Joi = require("joi");
+const { insert, find, collections } = require("../common/mongo");
+const lambdaReponse = require("../common/lambdaResponse").lambdaReponse;
+const Boom = require("boom");
+const { isLoggedIn } = require("../common/auth");
+const { startCase, snakeCase } = require("lodash");
 
-    return lambdaReponse(team)
-    
-  };
-  
+module.exports.handler = async (event) => {
+  const jwt = await isLoggedIn(event);
+  if (!jwt || jwt.type !== "superadmin")
+    return lambdaReponse(Boom.unauthorized());
+  const body = JSON.parse(event.body);
+
+  const team = { ...body };
+  team._id = snakeCase(team.name);
+  delete team.name;
+  await insert(collections.teams, team);
+  return lambdaReponse({ ...team, name: startCase(team._id) });
+};

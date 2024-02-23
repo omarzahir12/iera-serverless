@@ -69,6 +69,15 @@ const update = async (collection, query, set, upsert) => {
     { returnOriginal: false, upsert }
   );
 };
+const updatenpush = async (collection, query, set, push, upsert) => {
+  console.log({ collection, query, set: JSON.stringify(set), upsert });
+  let col = await getCollection(collection);
+  return await col.findOneAndUpdate(
+    query,
+    { $set: set, $push: push },
+    { returnOriginal: false, upsert }
+  );
+};
 
 const push = async (collection, query, push, upsert) => {
   let col = await getCollection(collection);
@@ -79,6 +88,7 @@ const push = async (collection, query, push, upsert) => {
   );
 };
 module.exports.update = update;
+module.exports.updatenpush = updatenpush;
 module.exports.push = push;
 
 const insert = async (collection, query, set, upsert) => {
@@ -98,6 +108,7 @@ module.exports.collections = {
   users: "iera_users",
   events: "iera_events",
   teams: "iera_teams",
+  reports: "iera_reports",
   requests: "iera_requests",
   tmp_password: "iera_users_password",
   form_templates: "form_templates",

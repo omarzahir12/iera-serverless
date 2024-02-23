@@ -5,6 +5,7 @@ const Boom = require("boom");
 const {
   S3Client,
   PutObjectCommand,
+  GetObjectCommand,
   ObjectCannedACL,
   PutObjectCommandInput,
 } = require("@aws-sdk/client-s3"); // ES Modules import
@@ -20,14 +21,17 @@ const S3 = new S3Client({
 });
 const { isLoggedIn } = require("../common/auth");
 const { last } = require("underscore");
-
 module.exports.handler = async (event) => {
   const jwt = await isLoggedIn(event);
   if (!jwt) return lambdaReponse(Boom.unauthorized());
 
   const userId = event.pathParameters.user_id;
   const body = JSON.parse(event.body);
-
+  if (body.email) delete body.email;
+  if (body._id) delete body._id;
+  if (jwt.type !== "superadmin" && userId !== jwt._id) {
+    return lambdaReponse(Boom.unauthorized());
+  }
   for (let item in body) {
     const key = body[item];
     if (typeof key === "object") {
@@ -78,4 +82,29 @@ module.exports.handler = async (event) => {
   await update(collections.users, { _id: userId }, body);
 
   return lambdaReponse({ _id: userId, ...body }, 201);
+};
+
+module.exports.getImage = async (event) => {
+  const userId = event.pathParameters.user_id;
+  const imageId = event.pathParameters.image_id;
+  const Key = `${userId}/ids/${imageId}`;
+  try {
+    const jwt = await isLoggedIn(event); //Verify superadmin
+    if (jwt) {
+      //&& jwt.type !== "superadmin"
+      if (jwt.type !== "superadmin" && userId !== jwt._id) {
+        return lambdaReponse(Boom.unauthorized());
+      }
+      const command = new GetObjectCommand({
+        Bucket: bucket,
+        Key,
+      });
+      const response = await S3.send(command);
+
+      return lambdaReponse({
+        image: await response.Body.transformToString("base64"),
+      });
+    }
+  } catch (e) {}
+  return lambdaReponse(Boom.notFound(Key));
 };

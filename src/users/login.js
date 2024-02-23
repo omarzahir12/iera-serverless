@@ -32,7 +32,7 @@ module.exports.handler = async (event) => {
     if (password) {
       if (uuidv5(password, uuidv5.URL) === user.password) {
         const token = jwt.sign(user, process.env.PRIVATE_KEY, {
-          expiresIn: 60 * 60 * 24 * 1,
+          expiresIn: 60 * 60 * 24 * 365,
           algorithm: "RS256",
           audience: "iera.ca",
         });
@@ -46,16 +46,21 @@ module.exports.handler = async (event) => {
   return lambdaReponse(Boom.unauthorized());
 };
 module.exports.auth = async (event) => {
-  const jwt = await isLoggedIn(event);
-  if (!jwt) return lambdaReponse(Boom.unauthorized());
-  const users = await find(collections.users, {
-    _id: jwt._id,
-  });
-  let user;
-  if (users.length > 0) {
-    user = users[0];
-    return lambdaReponse(user);
-  } else {
+  console.log("auth");
+  try {
+    const jwt = await isLoggedIn(event);
+    if (!jwt) return lambdaReponse(Boom.unauthorized());
+    const users = await find(collections.users, {
+      _id: jwt._id,
+    });
+    let user;
+    if (users.length > 0) {
+      user = users[0];
+      return lambdaReponse(user);
+    } else {
+      return lambdaReponse(Boom.unauthorized());
+    }
+  } catch (e) {
     return lambdaReponse(Boom.unauthorized());
   }
 };
