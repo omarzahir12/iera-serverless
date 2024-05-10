@@ -16,6 +16,7 @@ module.exports.getTemplate = async (event) => {
   const templates = await find(collections.form_templates, {
     _id: form_id,
   });
+  console.log({ jwt, form_id, templates });
   if (templates.length > 0) {
     const template = templates[0];
     return lambdaReponse(template.form);

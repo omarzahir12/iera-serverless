@@ -20,6 +20,7 @@
     "joi": "^17.11.0",
     "joi-jwt": "^1.0.1",
     "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
     "mongodb": "^6.3.0",
     "underscore": "^1.13.6",
     "uuid": "^9.0.1"

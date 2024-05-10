@@ -17,9 +17,16 @@ const createTeamValidator = {
 };
 module.exports.handler = async (event) => {
   const jwt = await isLoggedIn(event);
+  //console.log({ jwt });
   if (!jwt || jwt.type !== "superadmin")
     return lambdaReponse(Boom.unauthorized());
-  const teams = await find(collections.teams, {});
+  const filter = event.queryStringParameters
+    ? event.queryStringParameters.filter
+    : null;
+  const teams = await find(
+    collections.teams,
+    filter ? { parent_team: filter } : {}
+  );
   console.log({ teams });
   return lambdaReponse(
     teams.map((team) => {

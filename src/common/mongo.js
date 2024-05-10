@@ -107,6 +107,7 @@ module.exports.insert = insert;
 module.exports.collections = {
   users: "iera_users",
   events: "iera_events",
+  sub_events: "iera_sub_events",
   teams: "iera_teams",
   reports: "iera_reports",
   requests: "iera_requests",
