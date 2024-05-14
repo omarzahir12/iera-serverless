@@ -58,16 +58,14 @@ db.form_templates.updateOne(
         {
           type: "datetime",
           label: "Start date & time",
-          name: "single_start",
+          name: "start",
           required: true,
-          condition: { name: "event_type", value: "single" },
         },
         {
-          type: "datetime",
-          label: "End date & time",
-          name: "single_end",
+          type: "number",
+          label: "Length of Event in hours",
+          name: "event_length",
           required: true,
-          condition: { name: "event_type", value: "single" },
         },
         {
           type: "select",
@@ -89,57 +87,6 @@ db.form_templates.updateOne(
               value: "yearly",
             },
           ],
-        },
-        {
-          type: "select",
-          label: "Day of the week",
-          name: "day_of_week",
-          required: true,
-          condition: { name: "event_type", value: "recurring" },
-          options: [
-            {
-              label: "Saturday",
-              value: "saturday",
-            },
-            {
-              label: "Sunday",
-              value: "sunday",
-            },
-            {
-              label: "Monday",
-              value: "monday",
-            },
-            {
-              label: "Tuesday",
-              value: "tuesday",
-            },
-            {
-              label: "Wednesday",
-              value: "wednesday",
-            },
-            {
-              label: "Thursday",
-              value: "thursday",
-            },
-            {
-              label: "Friday",
-              value: "friday",
-            },
-          ],
-        },
-        {
-          type: "time",
-          label: "Start time",
-          name: "day_of_week_start",
-          required: true,
-          condition: { name: "event_type", value: "recurring" },
-        },
-        {
-          type: "time",
-          label: "End time",
-          name: "day_of_week_end",
-          required: true,
-          condition: { name: "event_type", value: "recurring" },
         },
         {
           type: "select",

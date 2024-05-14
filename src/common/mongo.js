@@ -78,6 +78,16 @@ const updatenpush = async (collection, query, set, push, upsert) => {
     { returnOriginal: false, upsert }
   );
 };
+const addToSet = async (collection, query, set) => {
+  console.log({ collection, query, addToSet: JSON.stringify(set) });
+  let col = await getCollection(collection);
+  return await col.findOneAndUpdate(query, { $addToSet: set });
+};
+const removeFromSet = async (collection, query, set) => {
+  console.log({ collection, query, pull: JSON.stringify(set) });
+  let col = await getCollection(collection);
+  return await col.findOneAndUpdate(query, { $pull: set });
+};
 
 const push = async (collection, query, push, upsert) => {
   let col = await getCollection(collection);
@@ -90,6 +100,8 @@ const push = async (collection, query, push, upsert) => {
 module.exports.update = update;
 module.exports.updatenpush = updatenpush;
 module.exports.push = push;
+module.exports.addToSet = addToSet;
+module.exports.removeFromSet = removeFromSet;
 
 const insert = async (collection, query, set, upsert) => {
   let col = await getCollection(collection);
@@ -99,7 +111,7 @@ const insert = async (collection, query, set, upsert) => {
   } else {
     if (query.length === undefined) return await col.insertOne(query);
     else if (query.length === 1) return await col.insertOne(query[0]);
-    else if (query.lengh > 1)
+    else if (query.length > 1)
       return await col.insertMany(query, { ordered: false });
   }
 };
@@ -108,6 +120,7 @@ module.exports.collections = {
   users: "iera_users",
   events: "iera_events",
   sub_events: "iera_sub_events",
+  sub_events_attendance: "iera_sub_events_attendance",
   teams: "iera_teams",
   reports: "iera_reports",
   requests: "iera_requests",

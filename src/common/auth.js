@@ -31,11 +31,11 @@ module.exports.isLoggedIn = async (req, fromDB) => {
       algorithm: "RS256",
       audience: "iera.ca",
     });
-    /*if (fromDB) {
+    if (fromDB) {
       const users = await find(collections.users, { _id: decoded._id });
       console.log({ users });
       return users[0];
-    }*/
+    }
     return decoded;
   } else {
     console.log("no token");

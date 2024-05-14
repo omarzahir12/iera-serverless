@@ -11,13 +11,12 @@ const Boom = require("boom");
 const { v4: uuidv4, v5: uuidv5 } = require("uuid");
 
 module.exports.handler = async (event) => {
+  const teamId = event.pathParameters.team_id;
   const start = event.queryStringParameters
     ? event.queryStringParameters.past
       ? { $lte: new Date() }
       : { $gt: new Date() }
     : { $gt: new Date() };
-  const teamId = event.pathParameters.team_id;
-
   const teams = await find(
     collections.sub_events,
     {

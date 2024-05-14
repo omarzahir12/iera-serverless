@@ -6,6 +6,8 @@ const {
   deleteTempPassword,
 } = require("../common/mongo");
 const lambdaReponse = require("../common/lambdaResponse").lambdaReponse;
+const dd = require("./dd");
+const processPostEvent = require("./processPostEvent").processPostEvent;
 const Boom = require("boom");
 const { v4: uuidv4, v5: uuidv5 } = require("uuid");
 const createEventValidator = {
@@ -27,6 +29,7 @@ module.exports.handler = async (e) => {
   event._id = uuidv4();
   event.teamId = teamId;
   await insert(collections.events, { ...event });
+  await processPostEvent(event, teamId);
 
   return lambdaReponse(event);
 };
