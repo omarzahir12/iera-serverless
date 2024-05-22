@@ -126,5 +126,6 @@ module.exports.collections = {
   requests: "iera_requests",
   tmp_password: "iera_users_password",
   form_templates: "form_templates",
+  exec: "iera_exec",
 };
 module.exports.ObjectId = ObjectId;

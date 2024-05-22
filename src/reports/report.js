@@ -72,7 +72,7 @@ module.exports.gets = async (event) => {
       if (subevents.length === 0) {
         if (type === "event_report" && jwt.type !== "superadmin") {
           toSend = filter(toSend, (o) => {
-            return o.user._id === jwt._id;
+            return o.mentor_id === jwt._id;
           });
         }
       }

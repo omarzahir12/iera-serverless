@@ -24,7 +24,17 @@ module.exports.handler = async (event) => {
   await addToSet(
     collections.sub_events,
     { _id: eventId },
-    { attendance: { ...body, id: jwt._id } }
+    {
+      attendance: {
+        ...body,
+        id: jwt._id,
+        user: {
+          id: jwt._id,
+          first_name: jwt.first_name,
+          last_name: jwt.last_name,
+        },
+      },
+    }
   );
   return lambdaReponse({});
 };

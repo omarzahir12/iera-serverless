@@ -12,7 +12,7 @@ const { isLoggedIn } = require("../common/auth");
 
 module.exports.handler = async (event) => {
   const body = JSON.parse(event.body);
-  const email = body.email;
+  const email = body.email.toLowerCase();
   const _id = uuidv5(email, uuidv5.URL);
   //TODO allow only superadmin to create orgs and new muslim and orgs to create newmuslim
   try {

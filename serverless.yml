@@ -45,6 +45,12 @@ functions:
       - httpApi:
           path: /users
           method: get
+  getNames:
+    handler: src/users/get.names
+    events:
+      - httpApi:
+          path: /users_names
+          method: post
   getUser:
     handler: src/users/getUser.handler
     events:
@@ -180,11 +186,29 @@ functions:
       - httpApi:
           path: /reports/{type}/{_id}
           method: post
+  generateReports:
+    handler: src/reports/report_new.create
+    events:
+      - httpApi:
+          path: /gen/reports/events
+          method: get
+  generateReportsMentor:
+    handler: src/reports/report_new.create_for_mentors
+    events:
+      - httpApi:
+          path: /gen/reports/mentor
+          method: get
   getReports:
     handler: src/reports/report.gets
     events:
       - httpApi:
           path: /reports/{type}/{_id}
+          method: get
+  getReportsNew:
+    handler: src/reports/report_new.gets
+    events:
+      - httpApi:
+          path: /reports
           method: get
   getReport:
     handler: src/reports/report.get
@@ -192,5 +216,11 @@ functions:
       - httpApi:
           path: /reports/{type}/{_id}/{report_id}
           method: get
+  updateReport:
+    handler: src/reports/report_new.update
+    events:
+      - httpApi:
+          path: /reports/{report_id}
+          method: PUT
 plugins:
   - serverless-offline

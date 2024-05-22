@@ -21,6 +21,7 @@ const createEventValidator = {
 module.exports.processPostEvent = async (event, teamId) => {
   if (event.event_type === "recurring" && event.status === "active") {
     const sub_events = await find(collections.sub_events, {
+      parent_id: event._id,
       status: "active",
       teamId,
       start: { $gte: new Date() },

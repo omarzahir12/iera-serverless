@@ -61,3 +61,31 @@ module.exports.handler = async (event) => {
     return lambdaReponse(Boom.unauthorized());
   }
 };
+module.exports.names = async (event) => {
+  const ids = JSON.parse(event.body).ids;
+  try {
+    const jwt = await isLoggedIn(event); //Verify superadmin
+
+    if (!jwt) return lambdaReponse(Boom.unauthorized());
+    if (jwt.type === "superadmin" || jwt.admins.length > 0) {
+    }
+    const users = await find(collections.users, { _id: { $in: ids } });
+
+    return lambdaReponse(
+      _.keyBy(
+        users.map((user) => {
+          return {
+            id: user._id,
+            name: user.first_name
+              ? user.first_name + " " + user.last_name
+              : user.email,
+          };
+        }),
+        "id"
+      )
+    );
+  } catch (e) {
+    console.log({ e });
+    return lambdaReponse([]);
+  }
+};
