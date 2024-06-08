@@ -79,7 +79,11 @@ module.exports.handler = async (event) => {
     }
   }
 
-  await update(collections.users, { _id: userId }, body);
+  await update(
+    collections.users,
+    { _id: userId },
+    { ...body, updated_on: new Date() }
+  );
 
   return lambdaReponse({ _id: userId, ...body }, 201);
 };

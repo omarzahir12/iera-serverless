@@ -1,0 +1,497 @@
+[
+    {
+        "type" : "text",
+        "label" : "First Name",
+        "name" : "first_name",
+        "required" : true
+    },
+    {
+        "type" : "text",
+        "label" : "Last Name",
+        "name" : "last_name",
+        "required" : true
+    },
+    {
+        "type" : "select",
+        "label" : "Gender",
+        "name" : "gender",
+        "required" : true,
+        "options" : [
+            {
+                "label" : "Male",
+                "value" : "male"
+            },
+            {
+                "label" : "Female",
+                "value" : "female"
+            }
+        ]
+    },
+    {
+        "type" : "number",
+        "label" : "Birth Year",
+        "name" : "birth_year",
+        "required" : true
+    },
+    {
+        "type" : "text",
+        "label" : "Postal Code",
+        "name" : "postal_code",
+        "required" : true
+    },
+    {
+        "type" : "text",
+        "label" : "Mobile Number",
+        "name" : "mobile",
+        "required" : true
+    },
+    {
+        "type" : "text",
+        "label" : "Social media handler or link",
+        "name" : "social",
+        "required" : true
+    },
+    {
+        "type" : "select",
+        "label" : "What position are you applying for?",
+        "name" : "position",
+        "required" : true,
+        "options" : [
+            {
+                "label" : "Street Dawah",
+                "value" : "street_dawah"
+            },{
+                "label" : "Daae",
+                "value" : "street_dawah"
+            },
+            {
+                "label" : "New Muslim Mentor",
+                "value" : "new_muslim_mentor"
+            },
+            {
+                "label" : "Volunteer Coordinator",
+                "value" : "vol_coordinator"
+            },
+            {
+                "label" : "Team Leader",
+                "value" : "vol_coordinator"
+            },
+            {
+                "label" : "Volunteer Management Team",
+                "value" : "vol_coordinator"
+            },
+            {
+                "label" : "Copywriter",
+                "value" : "copywriter"
+            },
+            {
+                "label" : "Copywriter",
+                "value" : "copywriter"
+            },
+            {
+                "label" : "IT Team",
+                "value" : "it"
+            },
+            {
+                "label" : "Education Team",
+                "value" : "education"
+            },
+            {
+                "label" : "Videographer",
+                "value" : "videographer"
+            },
+            {
+                "label" : "Video editing team",
+                "value" : "videographer"
+            },
+            {
+                "label" : "Photographer",
+                "value" : "photographer"
+            },
+            {
+                "label" : "Fundraising Team",
+                "value" : "fundraising"
+            },
+            {
+                "label" : "Project Management Team",
+                "value" : "project_management"
+            },
+            {
+                "label" : "Logistics Team",
+                "value" : "logistics"
+            },
+            {
+                "label" : "Logistic Team",
+                "value" : "logistics"
+            },
+            {
+                "label" : "Media Team",
+                "value" : "media"
+            },
+            {
+                "label" : "Graphic Design Team",
+                "value" : "graphic_design"
+            },
+            {
+                "label" : "Public Relations Team",
+                "value" : "public_relations"
+            },
+            {
+                "label" : "Social Media Team",
+                "value" : "social_media"
+            },
+            {
+                "label" : "Social media coordinator",
+                "value" : "social_media"
+            },
+            {
+                "label" : "Admin Team",
+                "value" : "admin"
+            },
+            {
+                "label" : "Admin",
+                "value" : "admin"
+            },
+            {
+                "label" : "General volunteer",
+                "value" : "gen_volunteer"
+            },
+            {
+                "label" : "Anything",
+                "value" : "gen_volunteer"
+            },
+            {
+                "label" : "All other Activities",
+                "value" : "gen_volunteer"
+            },
+            {
+                "label" : "Volunteer",
+                "value" : "gen_volunteer"
+            },
+            {
+                "label" : "All of the above listed - I am a all rounded kind of a person alhamdulila",
+                "value" : "gen_volunteer"
+            }
+        ]
+    },
+    {
+        "type" : "checkbox",
+        "label" : "I have experience in the above position",
+        "name" : "experience"
+    },
+    {
+        "type" : "select",
+        "label" : "Do you have Dawah Training?",
+        "name" : "dawah_training",
+        "required" : true,
+        "options" : [
+            {
+                "label" : "Yes, I attended iERA courses",
+                "value" : "yes_iera"
+            },
+            {
+                "label" : "Yes, I learned from another institution",
+                "value" : "yes_other"
+            },
+            {
+                "label" : "No, but I am eager to learn",
+                "value" : "no"
+            }
+        ]
+    },
+    {
+        "type" : "select",
+        "label" : "Do you have a formal islamic education? (ie. Diploma, Bachelors, Masters etc.)",
+        "name" : "islamic_education",
+        "required" : true,
+        "options" : [
+            {
+                "label" : "Yes",
+                "value" : "yes"
+            },
+            {
+                "label" : "No, but I attend halaqas and classes",
+                "value" : "no_halaqa"
+            },
+            {
+                "label" : "No, but I learn on my own online",
+                "value" : "no_own"
+            },
+            {
+                "label" : "No",
+                "value" : "no"
+            }
+        ]
+    },
+    {
+        "type" : "text",
+        "label" : "Name the institution that you studied in?",
+        "name" : "islamic_education_institute",
+        "required" : true,
+        "condition" : {
+            "name" : "islamic_education",
+            "value" : "yes"
+        }
+    },
+    {
+        "type" : "select",
+        "label" : "How many hours can you volunteer per week?",
+        "name" : "volunteer_hours",
+        "required" : true,
+        "options" : [
+            {
+                "label" : "2 to 4 hours",
+                "value" : "2-4"
+            },
+            {
+                "label" : "4 to 6 hours",
+                "value" : "4-6"
+            },
+            {
+                "label" : "6 to 8 hours",
+                "value" : "6-8"
+            },
+            {
+                "label" : "more than 8 hours",
+                "value" : ">8"
+            }
+        ]
+    },
+    {
+        "type" : "select",
+        "label" : "What skills/knowledge background do you have?",
+        "name" : "skills",
+        "required" : true,
+        "options" : [
+            {
+                "label" : "Financial management"
+            },
+            {
+                "label" : "General project management"
+            },
+            {
+                "label" : "Logistic and supply chain management"
+            },
+            {
+                "label" : "People management"
+            },
+            {
+                "label" : "English writing skills"
+            },
+            {
+                "label" : "Network/Public relations"
+            },
+            {
+                "label" : "Fundraising"
+            },
+            {
+                "label" : "Public Speaking/Training"
+            },
+            {
+                "label" : "Graphic Design"
+            },
+            {
+                "label" : "IT/Networking"
+            },
+            {
+                "label" : "Multimedia/Video/Photo shooting"
+            },
+            {
+                "label" : "Administration"
+            },
+            {
+                "label" : "Marketing"
+            },
+            {
+                "label" : "Other"
+            }
+        ]
+    },
+    {
+        "type" : "text",
+        "label" : "Tell us more about your other skill?",
+        "name" : "skills_other",
+        "required" : true,
+        "condition" : {
+            "name" : "skills",
+            "value" : "Other"
+        }
+    },
+    {
+        "type" : "textarea",
+        "label" : "iERA's mission is to connect humanity with God - by giving dawah. Why is dawah important to you?",
+        "name" : "iera_mission",
+        "required" : true
+    },
+    {
+        "type" : "textarea",
+        "label" : "Why do you want to volunteer with iERA specifically?",
+        "name" : "iera_why",
+        "required" : true
+    },
+    {
+        "type" : "upload",
+        "label" : "Drop or tap here to upload your IDs?",
+        "name" : "ids",
+        "max" : 2,
+        "required" : true,
+        "error" : "Please select atleast one document to upload (maximum 2)"
+    },
+    {
+        "type" : "select",
+        "label" : "Do you have any criminal convictions at home or abroad?",
+        "name" : "criminal_convictions",
+        "required" : true,
+        "info" : "If you need some assistance with this question, please consult the official guidance in your country for further information. If you have chosen yes, summarize details below. Having a conviction will not necessarily stop you from volunteering, but will need to be taken into consideration when assessing your suitability.",
+        "options" : [
+            {
+                "label" : "Yes",
+                "value" : "yes"
+            },
+            {
+                "label" : "No",
+                "value" : "no"
+            }
+        ]
+    },
+    {
+        "type" : "textarea",
+        "label" : "If you have criminal convictions, please give details of offences, penalties and dates in the table below including any pending charges or court cases.",
+        "name" : "criminal_details",
+        "required" : true,
+        "condition" : {
+            "name" : "criminal_convictions",
+            "value" : "yes"
+        }
+    },
+    {
+        "type" : "select",
+        "label" : "Do you benefit financially or otherwise from iERA, either directly or indirectly through someone you are connected to that can present an actual or potential conflict of interest with your role?",
+        "name" : "benefit_from_iera",
+        "required" : true,
+        "info" : "A conflict of interest is where you could benefit from iERA, either directly or indirectly through someone you're connected to. Having a conflict of interest doesn't mean you've done something wrong, but it needs to be managed properly.",
+        "options" : [
+            {
+                "label" : "Yes",
+                "value" : "yes"
+            },
+            {
+                "label" : "No",
+                "value" : "no"
+            }
+        ]
+    },
+    {
+        "type" : "textarea",
+        "label" : "If you benefit finanically, please clarify.",
+        "name" : "benefit_from_iera_details",
+        "required" : true,
+        "condition" : {
+            "name" : "benefit_from_iera",
+            "value" : "yes"
+        }
+    },
+    {
+        "type" : "select",
+        "label" : "Have you offered/been offered any gifts to/by iERA?",
+        "name" : "offered_gifts",
+        "required" : true,
+        "info" : "Include any gifts or hospitality offered to you, or offered by you to, external bodies in the last 12 months and whether this was declined or accepted (which has not been previously declared).",
+        "options" : [
+            {
+                "label" : "Yes",
+                "value" : "yes"
+            },
+            {
+                "label" : "No",
+                "value" : "no"
+            }
+        ]
+    },
+    {
+        "type" : "textarea",
+        "label" : "If you have been offered gifts, please clarify.",
+        "name" : "offered_gifts_details",
+        "required" : true,
+        "condition" : {
+            "name" : "offered_gifts",
+            "value" : "yes"
+        }
+    },
+    {
+        "type" : "select",
+        "label" : "Do you have any other conflicts that have not been covered?",
+        "name" : "other_conflicts",
+        "required" : true,
+        "options" : [
+            {
+                "label" : "Yes",
+                "value" : "yes"
+            },
+            {
+                "label" : "No",
+                "value" : "no"
+            }
+        ]
+    },
+    {
+        "type" : "textarea",
+        "label" : "If you have other conflicts, please clarify.",
+        "name" : "other_conflicts_details",
+        "required" : true,
+        "condition" : {
+            "name" : "other_conflicts",
+            "value" : "yes"
+        }
+    },
+    {
+        "type" : "text_copy",
+        "label" : "Please confirm you understand the following:",
+        "name" : "confirmation_of_understanding_text",
+        "required" : false,
+        "info" : "By completing and submitting this form you agree that you have read, understood and agree to the Terms of Use, Privacy Policy, Conflicts of Interest, Data Protection Statement, Code of Conduct, Anti Extremism Statement and the iERA Chat Operator Risk Agreement.",
+        "options" : [
+            {
+                "label" : "Terms and Conditions",
+                "value" : "https://iera.ca/terms-and-conditions"
+            },
+            {
+                "label" : "Privacy Policy",
+                "value" : "https://iera.ca/privacy-policy"
+            },
+            {
+                "label" : "Chat Operator Agreement",
+                "value" : "https://iera.ca/chat-operator-agreement"
+            },
+            {
+                "label" : "Data Protection statement",
+                "value" : "https://iera.ca/data-statement"
+            },
+            {
+                "label" : "Extremism Policy",
+                "value" : "https://iera.ca/extremism-policy"
+            },
+            {
+                "label" : "Code of Conduct",
+                "value" : "https://iera.ca/code-of-conduct"
+            }
+        ]
+    },
+    {
+        "type" : "checkbox",
+        "label" : "I agree",
+        "name" : "confirmation_of_understanding",
+        "required" : true,
+        "info" : "By completing and submitting this form you agree that you have read, understood and agree to the Terms of Use, Privacy Policy, Conflicts of Interest, Data Protection Statement, Code of Conduct, Anti Extremism Statement and the iERA Chat Operator Risk Agreement.",
+        "options" : [
+            {
+                "label" : "I agree",
+                "value" : "agree"
+            },
+            {
+                "label" : "I do not agree",
+                "value" : "disagree"
+            }
+        ]
+    }
+]

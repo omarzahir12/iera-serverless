@@ -18,7 +18,7 @@ module.exports.handler = async (event) => {
   try {
     const jwt = await isLoggedIn(event);
     if (!jwt) return lambdaReponse(Boom.unauthorized());
-    user = { _id, ...body };
+    user = { _id, ...body, created_on: new Date(), updated_on: new Date() };
     try {
       await insert(collections.users, user);
       return lambdaReponse({ status: "inserted" });

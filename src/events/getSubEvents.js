@@ -17,7 +17,7 @@ module.exports.handler = async (event) => {
       : { $gt: new Date() }
     : { $gt: new Date() };
   const teamId = event.pathParameters.team_id;
-
+  console.log({ start });
   const teams = await find(
     collections.sub_events,
     {

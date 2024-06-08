@@ -189,12 +189,14 @@ functions:
   generateReports:
     handler: src/reports/report_new.create
     events:
+      - schedule: cron(0/5 * * * ? *)
       - httpApi:
           path: /gen/reports/events
           method: get
   generateReportsMentor:
     handler: src/reports/report_new.create_for_mentors
     events:
+      - schedule: cron(0 5 ? * SUN *)
       - httpApi:
           path: /gen/reports/mentor
           method: get

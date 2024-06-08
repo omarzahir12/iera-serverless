@@ -56,7 +56,7 @@ module.exports.create = async (event) => {
       console.log({ reports });
       await insert(
         collections.reports,
-        { _id, type: "event_report", reports },
+        { _id, type: "event_report", reports, meta: event.name },
         null
       );
     }
@@ -140,13 +140,19 @@ module.exports.gets = async (event) => {
         report.status === status &&
         (jwt.type === "superadmin" || report.mentor_id === jwt._id)
       )
-        toSend.push({ ...report, type: r.type, _id: r._id });
+        toSend.push({
+          ...report,
+          type: r.type,
+          _id: r._id,
+          meta: r.meta ? r.meta : report.meta,
+        });
     }
   }
   console.log({ toSend });
 
   return lambdaReponse(toSend);
 };
+
 module.exports.update = async (event) => {
   const report_id = event.pathParameters.report_id;
 
@@ -167,4 +173,13 @@ module.exports.update = async (event) => {
     true
   );
   return lambdaReponse({ toDB, report_id }, 201);
+};
+module.exports.get = async (event) => {
+  //TODO
+  const jwt = await isLoggedIn(event, true);
+  if (!jwt) return lambdaReponse(Boom.unauthorized());
+
+  let toSend = [];
+
+  return lambdaReponse(toSend);
 };

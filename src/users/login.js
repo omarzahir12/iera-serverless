@@ -26,7 +26,13 @@ module.exports.handler = async (event) => {
       user = users[0];
     }
     if (!user) {
-      user = { _id, type, email };
+      user = {
+        _id,
+        type,
+        email,
+        created_on: new Date(),
+        updated_on: new Date(),
+      };
       await insert(collections.users, user);
     }
     if (password) {

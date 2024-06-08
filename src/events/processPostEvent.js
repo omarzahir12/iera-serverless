@@ -49,5 +49,29 @@ module.exports.processPostEvent = async (event, teamId) => {
       //console.log({ toAdd, dates });
       await insert(collections.sub_events, toAdd);
     }
+  } else if (event.event_type === "single" && event.status === "active") {
+    const sub_events = await find(collections.sub_events, {
+      parent_id: event._id,
+      status: "active",
+      teamId,
+    });
+    if (sub_events.length < 1) {
+      let toAdd = [];
+      toAdd.push({
+        _id: uuidv4(),
+        name: event.name,
+        description: event.description,
+        city: event.city,
+        min_participants: event.min_participants,
+        teamId,
+        event_type: "sub_event",
+        parent_id: event._id,
+        status: "active",
+        start: new Date(event.start),
+        event_length: event.event_length,
+      });
+      console.log({ toAdd });
+      await insert(collections.sub_events, toAdd);
+    }
   }
 };
