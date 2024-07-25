@@ -14,6 +14,15 @@ provider:
     PUBLIC_KEY: ${ssm:/public_key}
     R2_ACCESS_ID: ${ssm:/r2_access_id}
     R2_ACCESS_SECRET: ${ssm:/r2_access_secret}
+    MICROSOFT_ACCESS_TOKEN_ID: ${ssm:/microsoft_access_token_id}
+    MICROSOFT_TENANT_ID: ${ssm:/microsoft_tenant_id}
+    MICROSOFT_CLIENT_ID: ${ssm:/microsoft_client_id}
+    MICROSOFT_CLIENT_SECRET: ${ssm:/microsoft_client_secret}
+    MICROSOFT_SCOPE: ${ssm:/microsoft_scope}
+    SHAREPOINT_STREET_DAWAH_SITE_ID: ${ssm:/sharepoint_street_dawah_site_id}
+    SHAREPOINT_STREET_DAWAH_LIST_ID: ${ssm:/sharepoint_street_dawah_list_id}
+    SHAREPOINT_NEW_MUSLIM_WEEKLY_TRACKER_SITE_ID: ${ssm:/sharepoint_new_muslim_weekly_tracker_site_id}
+    SHAREPOINT_NEW_MUSLIM_WEEKLY_TRACKER_LIST_ID: ${ssm:/sharepoint_new_muslim_weekly_tracker_list_id}
     R2_ENDPOINT: https://b9068f786c3dc33c2c4b3cac9a1638cd.r2.cloudflarestorage.com
     R2_BUCKET: iera-canada-ids
   
@@ -224,5 +233,10 @@ functions:
       - httpApi:
           path: /reports/{report_id}
           method: PUT
+  handleMicrosoftToken:
+    handler: src/events/microsoftToken.handleMicrosoftToken
+    events:
+      - schedule:
+          rate: rate(45 minutes)
 plugins:
   - serverless-offline
