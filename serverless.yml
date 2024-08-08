@@ -224,5 +224,11 @@ functions:
       - httpApi:
           path: /reports/{report_id}
           method: PUT
+  notif:
+    handler: src/notif/events.handler
+    events:
+      - httpApi:
+          path: /notif/events
+          method: GET
 plugins:
   - serverless-offline
