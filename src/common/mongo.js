@@ -60,6 +60,15 @@ const getConfig = async () => {
 module.exports.find = find;
 module.exports.getConfig = getConfig;
 
+const aggregate = async (collection, pipeline) => {
+  const col = await getCollection(collection);
+  const result = await col.aggregate(pipeline);
+
+  return result.toArray();
+};
+
+module.exports.aggregate = aggregate;
+
 const update = async (collection, query, set, upsert) => {
   console.log({ collection, query, set: JSON.stringify(set), upsert });
   let col = await getCollection(collection);
@@ -127,5 +136,6 @@ module.exports.collections = {
   tmp_password: "iera_users_password",
   form_templates: "form_templates",
   exec: "iera_exec",
+  tokens: "tokens",
 };
 module.exports.ObjectId = ObjectId;
