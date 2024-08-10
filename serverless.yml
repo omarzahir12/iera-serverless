@@ -250,5 +250,11 @@ functions:
       - schedule:
           rate: rate(5 minutes)
   
+  notif:
+    handler: src/notif/events.handler
+    events:
+      - httpApi:
+          path: /notif/events
+          method: GET
 plugins:
   - serverless-offline
