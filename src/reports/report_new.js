@@ -10,10 +10,6 @@ const {
   PutObjectCommandInput,
 } = require("@aws-sdk/client-s3"); // ES Modules import
 const { v4: uuidv4, v5: uuidv5 } = require("uuid");
-const {
-  addNewEntryStreetDawahList,
-  addNewEntryNewMuslimWeeklyTrackerList,
-} = require("../common/microsoft");
 
 const endpoint = process.env.R2_ENDPOINT;
 const accessKeyId = process.env.R2_ACCESS_ID;
@@ -160,8 +156,8 @@ module.exports.gets = async (event) => {
 module.exports.update = async (event) => {
   const report_id = event.pathParameters.report_id;
 
-  const user = await isLoggedIn(event, true);
-  if (!user) return lambdaReponse(Boom.unauthorized());
+  const jwt = await isLoggedIn(event);
+  if (!jwt) return lambdaReponse(Boom.unauthorized());
   let body = JSON.parse(event.body);
   if (body.type) delete body.type;
   if (body._id) delete body._id;
@@ -170,45 +166,12 @@ module.exports.update = async (event) => {
   for (let k in body) {
     toDB["reports." + k] = body[k];
   }
-
-  const eventReport = await update(
+  await update(
     collections.reports,
     { "reports.id": report_id },
     { "reports.$.submit": body, "reports.$.status": "submitted" },
     true
   );
-
-  // If the report is not found in the database return 404
-  if (!eventReport || eventReport.length === 0) {
-    return lambdaReponse(Boom.notFound());
-  }
-
-  // add a new entry in the Street Dawah or New Muslim Weekly Tracker list based on the report type
-  try {
-    // Check if the report type is event_report
-    const isEventReport = eventReport[0]?.type === "event_report";
-    // Call the appropriate function to add a new entry in the Street Dawah or New Muslim Weekly Tracker list
-    const updateFunction = isEventReport
-      ? addNewEntryStreetDawahList
-      : addNewEntryNewMuslimWeeklyTrackerList;
-
-    // Call the appropriate function to add a new entry in the Street Dawah or New Muslim Weekly Tracker list
-    const entryResponse = await updateFunction(report_id, body, eventReport[0]);
-
-    // If the entry is added successfully, update the report with the entry id
-    if (entryResponse && entryResponse?.fields?.id) {
-      // Update the report with the entry id
-      await update(
-        collections.reports,
-        { "reports.id": report_id },
-        { "reports.$.entry_id": entryResponse.fields.id },
-        true
-      );
-    }
-  } catch (error) {
-    console.log("Error adding new entry in Street Dawah list", error);
-  }
-
   return lambdaReponse({ toDB, report_id }, 201);
 };
 module.exports.get = async (event) => {
