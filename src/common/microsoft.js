@@ -1,9 +1,11 @@
-const { find, collections, aggregate } = require("../common/mongo");
-const { getMicrosoftAccessToken } = require("../events/microsoftToken");
+const { find, collections, aggregate, update } = require("../common/mongo");
 
 const startCase = require("lodash/startCase");
 const capitalize = require("lodash/capitalize");
 
+const lambdaReponse = require("../common/lambdaResponse").lambdaReponse;
+const { filter } = require("lodash");
+const microsoftAccessTokenId = process.env.MICROSOFT_ACCESS_TOKEN_ID;
 // Variables for the Microsoft Graph API Authentication
 const tenantId = process.env.MICROSOFT_TENANT_ID;
 const clientId = process.env.MICROSOFT_CLIENT_ID;
@@ -47,6 +49,7 @@ const getAccessToken = async () => {
 
   return accessToken;
 };
+module.exports.getAccessToken = getAccessToken;
 
 /**
  * Add a new list item in a SharePoint list
@@ -58,7 +61,6 @@ const getAccessToken = async () => {
 const addNewListItem = async (siteId, listId, item) => {
   // Get the access token
   const accessToken = await getMicrosoftAccessToken();
-
   // Add the list item
   const response = await fetch(
     `https://graph.microsoft.com/v1.0/sites/${siteId}/lists/${listId}/items`,
@@ -109,7 +111,6 @@ const addNewEntryStreetDawahList = async (
   const startTime = new Date(subEvent?.start);
   const endTime = new Date(subEvent?.start);
   endTime.setHours(endTime.getHours() + Number(subEvent?.event_length));
-
   const item = {
     fields: {
       Title: user.first_name + " " + user.last_name, // string ex. "John Doe"
@@ -131,11 +132,14 @@ const addNewEntryStreetDawahList = async (
       Report_x0020_ID: reportId, // string ex. "1234"
     },
   };
-
   // Add the new list item in the SharePoint list and return the response
   return addNewListItem(streetDawahSiteId, streetDawahListId, item);
 };
-
+async function getLabelFromValue(name, value, formTemplate) {
+  const form = formTemplate[0].form.find((f) => f.name === name);
+  const option = form.options.find((o) => o.value === value);
+  return option.label;
+}
 /**
  * Add a new entry in the New Muslim Weekly Tracker list
  * @param {string} reportId The ID of the report from DB
@@ -168,24 +172,10 @@ const addNewEntryNewMuslimWeeklyTrackerList = async (
   const isMentorTalked = form.did_you === "yes";
 
   // Get the form option for the "which_lesson" or "why" forms, based on the "did_you" form, if mentor talked with the mentee we check the "which_lesson" form, otherwise we check the "why" form
-  const formName = isMentorTalked ? "which_lesson" : "why";
-  const formOption = await aggregate(collections.form_templates, [
-    { $match: { _id: "mentor" } },
-    { $unwind: { path: "$form" } },
-    { $match: { "form.name": formName } },
-    { $unwind: { path: "$form.options" } },
-    {
-      $match: {
-        "form.options.value": form[formName],
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        label: "$form.options.label",
-      },
-    },
-  ]);
+
+  const formTemplate = await find(collections.form_templates, {
+    _id: "mentor",
+  });
 
   const TODAY = new Date().toISOString();
 
@@ -197,19 +187,23 @@ const addNewEntryNewMuslimWeeklyTrackerList = async (
       NameofMentor: mentor.first_name + " " + mentor.last_name, // string ex. "John Doe"
       SubmissionDate: TODAY, // string ex. "2024-07-15T00:00:00Z"
       Whatdidyoudowithyourmentee_x003f: isMentorTalked
-        ? formOption[0].label
+        ? await getLabelFromValue(
+            "which_lesson",
+            form.which_lesson,
+            formTemplate
+          )
         : NOT_APPLICABLE, // string ex. "Lesson 1"
-      Datementortalkedwithmentee_x003a: isMentorTalked
-        ? new Date(form.date_talked).toISOString()
-        : TODAY, // string ex. "2024-07-15T00:00:00Z"
+      Datementortalkedwithmentee_x003a:
+        isMentorTalked && form.date_talked
+          ? new Date(form.date_talked).toISOString()
+          : TODAY, // string ex. "2024-07-15T00:00:00Z"
       Reasonfornotmentoringanyone: !isMentorTalked
-        ? formOption[0].label
+        ? await getLabelFromValue("why", form.why, formTemplate)
         : NOT_APPLICABLE, // string ex. "Graduated"
       From_x0020_App: true, // boolean ex. true / false
       Report_x0020_ID: reportId, // string ex. "1234"
     },
   };
-
   // Add the new list item in the SharePoint list and return the response
   return addNewListItem(
     newMuslimWeeklyTrackerSiteId,
@@ -218,7 +212,70 @@ const addNewEntryNewMuslimWeeklyTrackerList = async (
   );
 };
 
-module.exports.getAccessToken = getAccessToken;
 module.exports.addNewEntryStreetDawahList = addNewEntryStreetDawahList;
 module.exports.addNewEntryNewMuslimWeeklyTrackerList =
   addNewEntryNewMuslimWeeklyTrackerList;
+
+/**
+ * Get the Microsoft Access Token from the database
+ * @returns {Promise<{body: string, statusCode: number}>}
+ */
+const getMicrosoftAccessToken = async () => {
+  const tokens = await find(collections.tokens, {
+    _id: microsoftAccessTokenId,
+  });
+
+  if (tokens.length === 0 || tokens[0].expiresAt < new Date()) {
+    const accessToken = await setMicrosoftAccessToken();
+    return accessToken;
+  }
+
+  const expiresAt = new Date(tokens[0].expiresAt);
+  if (expiresAt < new Date()) {
+    const accessToken = await setMicrosoftAccessToken();
+    return accessToken;
+  }
+
+  return tokens[0].accessToken;
+};
+
+/**
+ * Set the Microsoft Access Token in the database
+ * @returns {Promise<{body: string, statusCode: number}>}
+ */
+const setMicrosoftAccessToken = async () => {
+  const response = await getAccessToken();
+
+  if (!response?.access_token) {
+    return lambdaReponse({ message: "No access token found" }, 500);
+  }
+
+  await update(
+    collections.tokens,
+    { _id: microsoftAccessTokenId },
+    {
+      accessToken: response.access_token,
+      expiresAt: new Date(Date.now() + response.expires_in * 1000),
+    },
+    true
+  );
+
+  return response.access_token;
+};
+
+const handleMicrosoftToken = async (event) => {
+  try {
+    const response = await setMicrosoftAccessToken();
+    return response;
+  } catch (err) {
+    console.error("Error to set Microsoft Access Token", err);
+    return lambdaReponse(
+      { message: "Error to set Microsoft Access Token" },
+      500
+    );
+  }
+};
+
+module.exports.getMicrosoftAccessToken = getMicrosoftAccessToken;
+module.exports.setMicrosoftAccessToken = setMicrosoftAccessToken;
+module.exports.handleMicrosoftToken = handleMicrosoftToken;

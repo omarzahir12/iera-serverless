@@ -233,10 +233,22 @@ functions:
       - httpApi:
           path: /reports/{report_id}
           method: PUT
-  handleMicrosoftToken:
-    handler: src/events/microsoftToken.handleMicrosoftToken
+  syncEventReports:
+    handler: src/reports/report_sync.sync_event_reports
     events:
+      #- httpApi:
+      #    path: /reports_sync/event_reports
+      #    method: GET
       - schedule:
-          rate: rate(45 minutes)
+          rate: rate(5 minutes)
+  syncMentorReports:
+    handler: src/reports/report_sync.sync_mentor_reports
+    events:
+      #- httpApi:
+      #    path: /reports_sync/mentor_reports
+      #    method: GET
+      - schedule:
+          rate: rate(5 minutes)
+  
 plugins:
   - serverless-offline
