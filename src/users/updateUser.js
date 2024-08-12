@@ -21,12 +21,19 @@ const S3 = new S3Client({
 });
 const { isLoggedIn } = require("../common/auth");
 const { last } = require("underscore");
+const {
+  sendWelcome,
+  volApproval,
+  volRefused,
+  newMuslimAdded,
+} = require("../common/email");
 module.exports.handler = async (event) => {
-  const jwt = await isLoggedIn(event);
+  const jwt = await isLoggedIn(event, true);
   if (!jwt) return lambdaReponse(Boom.unauthorized());
 
   const userId = event.pathParameters.user_id;
   const body = JSON.parse(event.body);
+  const toEmail = body.email;
   if (body.email) delete body.email;
   if (body._id) delete body._id;
   if (jwt.type !== "superadmin" && userId !== jwt._id) {
@@ -84,7 +91,30 @@ module.exports.handler = async (event) => {
     { _id: userId },
     { ...body, updated_on: new Date() }
   );
-
+  if (body.groups.indexOf("volunteer") > -1) {
+    if (
+      jwt.type !== "superadmin" &&
+      !jwt.status &&
+      body.status === "enrolled"
+    ) {
+      await sendWelcome(jwt.email);
+    }
+    if (jwt.type === "superadmin" && body.status === "approved") {
+      await volApproval(toEmail);
+    }
+    if (jwt.type === "superadmin" && body.status === "rejected") {
+      await volRefused(toEmail);
+    }
+  } else if (body.groups.indexOf("newmuslim") > -1 && jwt._id === userId) {
+    await newMuslimAdded({
+      first_name: body.first_name,
+      last_name: body.last_name,
+      email: jwt.email,
+      phone: body.phone,
+      who: "Self Registration",
+      type: "Self Registration",
+    });
+  }
   return lambdaReponse({ _id: userId, ...body }, 201);
 };
 

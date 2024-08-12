@@ -20,13 +20,19 @@ module.exports.handler = async (event) => {
     const jwt = await isLoggedIn(event, true); //Verify superadmin
 
     if (!jwt) return lambdaReponse(Boom.unauthorized());
-
+    const filter = {
+      groups: { $all: [type] },
+    };
+    const filter_org = {
+      groups: { $all: [type] },
+      created_by: jwt._id,
+    };
     const users = await find(
       collections.users,
-      jwt.type === "superadmin"
-        ? {
-            groups: { $all: [type] },
-          }
+      jwt.type === "superadmin" || jwt.type === "org"
+        ? jwt.type === "superadmin"
+          ? filter
+          : filter_org
         : { _id: { $in: jwt.mentees ? jwt.mentees : [] } }
     );
     if (type === "newmuslim") {

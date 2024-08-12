@@ -12,7 +12,8 @@ module.exports.handler = async (event) => {
   const body = JSON.parse(event.body);
   const email = body.email.toLowerCase();
   const password = body.password;
-  const type = body.type;
+  const type =
+    body.type && body.type === "newmuslim" ? "newmuslim" : "volunteer";
   const _id = uuidv5(email, uuidv5.URL);
 
   const query = { _id };
