@@ -39,6 +39,36 @@ module.exports = {
     ],
     template_id: "d-e1d2dffb24454f42b467b3ee048fb258",
   },
+  newVolunteerAdded: {
+    from: {
+      email: "no-reply@iera.ca",
+      name: "iERA",
+    },
+    personalizations: [
+      {
+        to: [
+          {
+            email: "admin@iera.ca",
+          },
+          {
+            email: "ausman@iera.ca",
+          },
+          {
+            email: "volunteer.manager@iera.ca",
+          },
+          {
+            email: "almahmud.ali@iera.ca",
+          },
+        ],
+        dynamic_template_data: {
+          first_name: "",
+          last_name: "",
+          details_name: "",
+        },
+      },
+    ],
+    template_id: "d-9361599f84f0458aaa0d90edaac6f70d",
+  },
   volApproval: {
     from: {
       email: "no-reply@iera.ca",

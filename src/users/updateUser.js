@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { collections, update } = require("../common/mongo");
+const { collections, update, find } = require("../common/mongo");
 const lambdaReponse = require("../common/lambdaResponse").lambdaReponse;
 const Boom = require("boom");
 const {
@@ -9,7 +9,7 @@ const {
   ObjectCannedACL,
   PutObjectCommandInput,
 } = require("@aws-sdk/client-s3"); // ES Modules import
-
+const { newVolunteerAdded } = require("../common/email");
 const endpoint = process.env.R2_ENDPOINT;
 const accessKeyId = process.env.R2_ACCESS_ID;
 const secretAccessKey = process.env.R2_ACCESS_SECRET;
@@ -92,6 +92,29 @@ module.exports.handler = async (event) => {
     { ...body, updated_on: new Date() }
   );
   if (body.groups.indexOf("volunteer") > -1) {
+    if (!jwt.status && body.status === "enrolled") {
+      const formTemplate = await find(collections.form_templates, {
+        _id: "volunteer",
+      });
+      const form = formTemplate[0].form;
+      const ignore_fields = ["ids", "birth_year"];
+      let details = "";
+      for (let item of form) {
+        if (body[item.name] && ignore_fields.indexOf(item.name) === -1) {
+          details +=
+            (item.info ? item.info : item.label) +
+            ": " +
+            body[item.name] +
+            "<br>";
+        }
+      }
+
+      await newVolunteerAdded({
+        first_name: body.first_name,
+        last_name: body.last_name,
+        details,
+      });
+    }
     if (
       jwt.type !== "superadmin" &&
       !jwt.status &&

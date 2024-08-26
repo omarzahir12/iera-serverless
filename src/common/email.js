@@ -27,3 +27,8 @@ module.exports.newMuslimAdded = async (data) => {
   template.personalizations[0].dynamic_template_data = data;
   await sgMail.send(template);
 };
+module.exports.newVolunteerAdded = async (data) => {
+  const template = { ...templates.newVolunteerAdded };
+  template.personalizations[0].dynamic_template_data = data;
+  await sgMail.send(template);
+};
