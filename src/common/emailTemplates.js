@@ -57,6 +57,9 @@ module.exports = {
             email: "volunteer.manager@iera.ca",
           },
           {
+            email: "jeneva.blanco@iera.ca",
+          },
+          {
             email: "almahmud.ali@iera.ca",
           },
         ],
@@ -128,6 +131,9 @@ module.exports = {
           },
           {
             email: "volunteer.manager@iera.ca",
+          },
+          {
+            email: "jeneva.blanco@iera.ca",
           },
           {
             email: "almahmud.ali@iera.ca",

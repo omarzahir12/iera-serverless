@@ -10,6 +10,7 @@ const { isLoggedIn } = require("../common/auth");
 const ALIAS = { mentor: "newmuslim" };
 const _ = require("lodash");
 module.exports.handler = async (event) => {
+  let team = event.queryStringParameters?.team;
   let type = event.queryStringParameters
     ? event.queryStringParameters.type
     : "volunteer";
@@ -20,20 +21,46 @@ module.exports.handler = async (event) => {
     const jwt = await isLoggedIn(event, true); //Verify superadmin
 
     if (!jwt) return lambdaReponse(Boom.unauthorized());
-    const filter = {
+    if (
+      jwt.type !== "org" &&
+      jwt.type !== "superadmin" &&
+      jwt.admins.indexOf(team) === -1 &&
+      type === "volunteer"
+    ) {
+      return lambdaReponse(Boom.unauthorized());
+    }
+
+    let filter = {
       groups: { $all: [type] },
     };
+    let teams_filter = null;
+    if (team) {
+      filter.teams = [team];
+    }
+    if (jwt.admins && jwt.admins.indexOf(team) > -1) {
+      teams_filter = [team];
+    }
     const filter_org = {
       groups: { $all: [type] },
       created_by: jwt._id,
     };
+    jwt.admins = jwt.admins ? jwt.admins : [];
+    const non_admin_filter =
+      type === "newmuslim"
+        ? { _id: { $in: jwt.mentees ? jwt.mentees : [] } }
+        : teams_filter
+        ? {
+            teams: teams_filter,
+          }
+        : null;
+
     const users = await find(
       collections.users,
       jwt.type === "superadmin" || jwt.type === "org"
         ? jwt.type === "superadmin"
           ? filter
           : filter_org
-        : { _id: { $in: jwt.mentees ? jwt.mentees : [] } }
+        : non_admin_filter
     );
     if (type === "newmuslim") {
       const mentees = await find(collections.users, {

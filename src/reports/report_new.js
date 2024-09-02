@@ -169,7 +169,11 @@ module.exports.update = async (event) => {
   await update(
     collections.reports,
     { "reports.id": report_id },
-    { "reports.$.submit": body, "reports.$.status": "submitted" },
+    {
+      "reports.$.submit": body,
+      "reports.$.status": "submitted",
+      "reports.$.updated_at": new Date(),
+    },
     true
   );
   return lambdaReponse({ toDB, report_id }, 201);

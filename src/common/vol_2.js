@@ -3,7 +3,7 @@ const moment = require("moment");
 const vol_q = require("./vol_2_question.json");
 const questions = lodash.keyBy(vol_q, "name");
 const { v4: uuidv4, v5: uuidv5 } = require("uuid");
-const team_datas = lodash.keyBy(require("./vol.json"), 0);
+const team_datas = lodash.keyBy(require("./vol_sept2.json"), 11);
 //console.log({ team_data });
 const headings = [
   "id",
@@ -115,14 +115,16 @@ const types = {
   skills_other: toSkillsOther,
   email: lodash.toLower,
 };
-const data = require("./vol_2.json");
+const data = require("./vol_2_sept2.json");
 let vols = [];
 for (let volunteer of data) {
-  const team_data = team_datas[volunteer[35]];
-
+  const team_data = null; //team_datas[volunteer[8]];
+  //console.log({ team_data });
   let vol = {
     type: "volunteer",
     groups: ["volunteer"],
+    created_on: new Date(volunteer[1]),
+    updated_on: new Date(volunteer[1]),
   };
   for (let heading in headings) {
     vol[headings[heading]] = types[headings[heading]]
@@ -137,11 +139,16 @@ for (let volunteer of data) {
         ? types["skills_other"](volunteer[heading], headings[heading])
         : lodash.trim(volunteer[heading]);
     } else if (headings[heading] === "email") {
+      const e = vol["email"].toLowerCase();
+      console.log({ e, email: vol["email"] });
       vol["_id"] = uuidv5(vol["email"], uuidv5.URL);
     } else if (headings[heading] === "status") {
-      vol["status"] = setStatus(vol["status"], team_data);
+      //vol["status"] = setStatus(vol["status"], team_data);
     } else if (headings[heading] === "teams") {
-      vol["teams"] = setStatus(vol["status"], team_data);
+      if (vol["teams"] === "") {
+        vol["teams"] = [];
+      }
+      //vol["teams"] = setStatus(vol["status"], team_data);
     } else if (headings[heading] === "comments") {
       if (team_data && lodash.trim(team_data[7])) {
         const user_info = {
@@ -170,4 +177,4 @@ for (let volunteer of data) {
 }
 console.log({ teams: Object.values(teams) });
 const fs = require("fs");
-fs.writeFileSync("./volunteer_2.json", JSON.stringify(vols, null, 2));
+fs.writeFileSync("./volunteer_3c.json", JSON.stringify(vols, null, 2));

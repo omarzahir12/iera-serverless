@@ -41,7 +41,7 @@ const find = async (collection, query, filter, limit, skip, sort, count) => {
       }
     }
   }
-  //console.log('query', JSON.stringify({collection, query, options}))
+  //console.log("query", JSON.stringify({ collection, query, options }));
 
   let col = await getCollection(collection);
   let result = await col.find(query, options);

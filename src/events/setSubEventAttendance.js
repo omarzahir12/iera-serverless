@@ -21,7 +21,7 @@ module.exports.handler = async (event) => {
   const teamId = event.pathParameters.team_id;
   const eventId = event.pathParameters.sub_event_id;
   const body = JSON.parse(event.body);
-  const jwt = await isLoggedIn(event);
+  const jwt = await isLoggedIn(event, true);
   if (!jwt) {
     console.log({ jwt });
     return lambdaReponse(Boom.unauthorized);

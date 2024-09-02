@@ -249,12 +249,32 @@ functions:
       #    method: GET
       - schedule:
           rate: rate(5 minutes)
-  
   notif:
     handler: src/notif/events.handler
     events:
       - httpApi:
           path: /notif/events
           method: GET
+  # new_import:
+  #   handler: src/common/nm_import.handler
+  #   timeout: 300
+  #   events:
+  #     - httpApi:
+  #         path: /import/newmuslims
+  #         method: GET
+  # new_update:
+  #   handler: src/common/nm_import.update
+  #   timeout: 300
+  #   events:
+  #     - httpApi:
+  #         path: /import/newmuslims_update
+  #         method: GET
+  # vol_import:
+  #   handler: src/common/volunteer_import.handler
+  #   timeout: 300
+  #   events:
+  #     - httpApi:
+  #         path: /import/volunteers
+  #         method: GET
 plugins:
   - serverless-offline
