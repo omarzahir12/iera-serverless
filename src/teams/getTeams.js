@@ -2,6 +2,7 @@ const Joi = require("joi");
 const {
   insert,
   find,
+  aggregate,
   collections,
   deleteTempPassword,
   update,
@@ -44,9 +45,45 @@ module.exports.handler = async (event) => {
         )
       : [];
   console.log({ teams });
+  const start = event.queryStringParameters
+    ? event.queryStringParameters.past
+      ? { $lte: new Date() }
+      : { $gt: new Date() }
+    : { $gt: new Date() };
+  console.log({ start });
+  const sub_events =
+    team_admin === "true"
+      ? await aggregate(collections.sub_events, [
+          {
+            $match: {
+              start,
+              status: "active",
+            },
+          },
+          {
+            $group: {
+              _id: "$teamId",
+              count: {
+                $sum: 1,
+              },
+            },
+          },
+          {
+            $sort: {
+              start: 1,
+            },
+          },
+        ])
+      : null;
   return lambdaReponse(
     teams.map((team) => {
-      return { ...team, name: startCase(team._id) };
+      return {
+        ...team,
+        name: startCase(team._id),
+        active_events: sub_events
+          ? sub_events.find((se) => se._id === team._id)?.count
+          : 0,
+      };
     })
   );
 };
