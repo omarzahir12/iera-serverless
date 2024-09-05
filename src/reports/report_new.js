@@ -54,11 +54,15 @@ module.exports.create = async (event) => {
         };
       });
       console.log({ reports });
-      await insert(
-        collections.reports,
-        { _id, type: "event_report", reports, meta: event.name },
-        null
-      );
+      try {
+        await insert(
+          collections.reports,
+          { _id, type: "event_report", reports, meta: event.name },
+          null
+        );
+      } catch (e) {
+        console.log({ e });
+      }
     }
     await update(collections.sub_events, { _id }, { report: true });
   }

@@ -9,6 +9,19 @@ const jwt = require("jsonwebtoken");
 const { isLoggedIn } = require("../common/auth");
 const ALIAS = { mentor: "newmuslim" };
 const _ = require("lodash");
+const { filter } = require("lodash");
+function cleanUserData(jwt, users) {
+  console.log({ jwt, users });
+  if (jwt.type === "superadmin") {
+    return users;
+  } else {
+    return users.map((user) => {
+      return jwt.gender && jwt.gender === user.gender
+        ? user
+        : { ...user, mobile: "(###) ###-####", email: "###@###" };
+    });
+  }
+}
 module.exports.handler = async (event) => {
   let team = event.queryStringParameters?.team;
   let type = event.queryStringParameters
@@ -24,7 +37,7 @@ module.exports.handler = async (event) => {
     if (
       jwt.type !== "org" &&
       jwt.type !== "superadmin" &&
-      jwt.admins.indexOf(team) === -1 &&
+      jwt.teams.indexOf(team) === -1 &&
       type === "volunteer"
     ) {
       return lambdaReponse(Boom.unauthorized());
@@ -35,10 +48,10 @@ module.exports.handler = async (event) => {
     };
     let teams_filter = null;
     if (team) {
-      filter.teams = [team];
+      filter.teams = { $all: [team] };
     }
-    if (jwt.admins && jwt.admins.indexOf(team) > -1) {
-      teams_filter = [team];
+    if (jwt.teams && jwt.teams.indexOf(team) > -1) {
+      teams_filter = { $all: [team] };
     }
     const filter_org = {
       groups: { $all: [type] },
@@ -88,7 +101,7 @@ module.exports.handler = async (event) => {
         }
       }
     }
-    return lambdaReponse(users);
+    return lambdaReponse(cleanUserData(jwt, users));
   } catch (e) {
     console.log({ e });
     return lambdaReponse(Boom.unauthorized());

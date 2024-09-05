@@ -85,7 +85,7 @@ module.exports.handler = async (event) => {
       }
     }
   }
-
+  const oUser = await find(collections.users, { _id: userId });
   await update(
     collections.users,
     { _id: userId },
@@ -122,10 +122,18 @@ module.exports.handler = async (event) => {
     ) {
       await sendWelcome(jwt.email);
     }
-    if (jwt.type === "superadmin" && body.status === "approved") {
+    if (
+      jwt.type === "superadmin" &&
+      body.status === "approved" &&
+      oUser[0].status !== "approved"
+    ) {
       await volApproval(toEmail);
     }
-    if (jwt.type === "superadmin" && body.status === "rejected") {
+    if (
+      jwt.type === "superadmin" &&
+      body.status === "rejected" &&
+      oUser[0].status !== "rejected"
+    ) {
       await volRefused(toEmail);
     }
   } else if (body.groups.indexOf("newmuslim") > -1 && jwt._id === userId) {

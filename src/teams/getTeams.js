@@ -25,12 +25,7 @@ module.exports.handler = async (event) => {
   const team_admin = event.queryStringParameters
     ? event.queryStringParameters.admin
     : null;
-  let ids =
-    jwt.type === "superadmin"
-      ? []
-      : team_admin
-      ? jwt.admins
-      : union(jwt.teams, jwt.admins);
+  let ids = jwt.type === "superadmin" ? [] : union(jwt.teams, jwt.admins);
   console.log({ ids });
   const filter = event.queryStringParameters
     ? event.queryStringParameters.filter
