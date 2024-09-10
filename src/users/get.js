@@ -37,6 +37,7 @@ module.exports.handler = async (event) => {
     if (
       jwt.type !== "org" &&
       jwt.type !== "superadmin" &&
+      jwt.teams &&
       jwt.teams.indexOf(team) === -1 &&
       type === "volunteer"
     ) {
