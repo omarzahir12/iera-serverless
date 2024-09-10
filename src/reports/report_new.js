@@ -22,7 +22,7 @@ const S3 = new S3Client({
 });
 const { isLoggedIn } = require("../common/auth");
 const { last } = require("underscore");
-const { filter, upperFirst } = require("lodash");
+const { filter, upperFirst, keyBy } = require("lodash");
 const moment = require("moment");
 module.exports.create = async (event) => {
   //Events
@@ -121,38 +121,69 @@ module.exports.create_for_mentors = async (event) => {
 module.exports.gets = async (event) => {
   const jwt = await isLoggedIn(event, true);
   if (!jwt) return lambdaReponse(Boom.unauthorized());
+  const type =
+    event.queryStringParameters && event.queryStringParameters.type
+      ? event.queryStringParameters.type
+      : "all";
   const status =
     event.queryStringParameters && event.queryStringParameters.status
       ? event.queryStringParameters.status
       : "pending";
   //const report_id = event.pathParameters.report_id;
-  const reports = await find(
-    collections.reports,
+  const query =
     jwt.type === "superadmin"
+      ? type === "all"
+        ? {
+            "reports.status": status,
+          }
+        : {
+            "reports.status": status,
+            type: type,
+          }
+      : type === "all"
       ? {
-          "reports.status": status,
-        }
-      : {
           "reports.status": status,
           "reports.mentor_id": jwt._id,
         }
-  );
+      : {
+          "reports.status": status,
+          type: type,
+          "reports.mentor_id": jwt._id,
+        };
+  const reports = await find(collections.reports, query);
   let toSend = [];
+  let ids = [];
   for (let r of reports) {
     for (let report of r.reports) {
       if (
         report.status === status &&
         (jwt.type === "superadmin" || report.mentor_id === jwt._id)
-      )
+      ) {
         toSend.push({
           ...report,
           type: r.type,
           _id: r._id,
           meta: r.meta ? r.meta : report.meta,
         });
+        ids.push(r._id);
+      }
     }
   }
-  console.log({ toSend });
+  let subEvents;
+  if (jwt.type === "superadmin" && type === "event_report") {
+    subEvents = keyBy(
+      await find(collections.sub_events, {
+        _id: { $in: ids },
+      }),
+      "_id"
+    );
+    for (let s of toSend) {
+      if (subEvents[s._id]) {
+        s.team = subEvents[s._id].teamId;
+      }
+    }
+  }
+  console.log({ toSend, reports, query, subEvents, ids, type });
 
   return lambdaReponse(toSend);
 };
