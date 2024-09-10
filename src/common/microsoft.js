@@ -127,7 +127,9 @@ const addNewEntryStreetDawahList = async (
       End_x0020_Time: startTime.toISOString(), // number ex. 30 / 30.0
       Start_x0020_Time: endTime.toISOString(), // number ex. 30 / 30.0
       No_x002e_OfQurancopies: Number(form.quran), // number ex. 10 / 10.0
-      Comments: form.comments, // string ex. "Great day!"
+      AnyChallenges: form.any_challenges, // string ex. "Great day!"
+      AnyAdvice: form.any_advice, // string ex. "Great day!"
+      AnyStories: form.any_story, // string ex. "Great day!"
       Duration: Number(form.duration), // boolean ex. true / false
       FromApp: true, // boolean ex. true / false
       Report_x0020_ID: reportId, // string ex. "1234"
