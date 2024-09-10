@@ -47,16 +47,17 @@ module.exports.handler = async (event) => {
       _id: eventId,
       "reports.mentor_id": jwt._id,
     });
-    if (reports.length === 0)
+    if (reports.length === 0) {
+      const ev = await find(collections.sub_events, { _id: eventId });
       await push(
         collections.reports,
-        { _id: eventId },
+        { _id: eventId, type: "event_report", meta: ev[0].name },
         {
           reports: {
             id: uuidv4(),
             status: "pending",
             submit: null,
-
+            meta: ev[0].name,
             created_at: new Date(),
             mentor_id: jwt._id,
             user: {
@@ -68,14 +69,12 @@ module.exports.handler = async (event) => {
         },
         true
       );
+    }
   }
   return lambdaReponse({});
 };
 module.exports.remove = async (event) => {
-  const teamId = event.pathParameters.team_id;
   const eventId = event.pathParameters.sub_event_id;
-  const body = JSON.parse(event.body);
-
   const jwt = await isLoggedIn(event);
   if (!jwt) {
     console.log({ jwt });
@@ -84,7 +83,7 @@ module.exports.remove = async (event) => {
   await removeFromSet(
     collections.sub_events,
     { _id: eventId },
-    { attendance: { ...body, id: jwt._id } }
+    { attendance: { id: jwt._id } }
   );
   return lambdaReponse({});
 };
