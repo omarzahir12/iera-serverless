@@ -180,6 +180,7 @@ module.exports.gets = async (event) => {
     for (let s of toSend) {
       if (subEvents[s._id]) {
         s.team = subEvents[s._id].teamId;
+        s.start = subEvents[s._id].start;
       }
     }
   }
