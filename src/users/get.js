@@ -11,8 +11,8 @@ const ALIAS = { mentor: "newmuslim" };
 const _ = require("lodash");
 const { filter } = require("lodash");
 function cleanUserData(jwt, users) {
-  console.log({ jwt, users });
-  if (jwt.type === "superadmin") {
+  console.log("cleanUserData", { jwt });
+  if (jwt.type === "superadmin" || (jwt.admins && jwt.admins.length > 0)) {
     return users;
   } else {
     return users.map((user) => {
