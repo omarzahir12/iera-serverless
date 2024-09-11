@@ -151,6 +151,18 @@ functions:
       - httpApi:
           path: /teams/{team_id}/sub_events
           method: get
+  setSubEventsAttendanceById:
+    handler: src/events/setSubEventAttendance.setById
+    events:
+      - httpApi:
+          path: /teams/{team_id}/sub_events_attendance/{sub_event_id}/{user_id}
+          method: put
+  deleteSubEventsAttendanceById:
+    handler: src/events/setSubEventAttendance.removeById
+    events:
+      - httpApi:
+          path: /teams/{team_id}/sub_events_attendance/{sub_event_id}/{user_id}
+          method: delete
   setSubEventsAttendance:
     handler: src/events/setSubEventAttendance.handler
     events:
