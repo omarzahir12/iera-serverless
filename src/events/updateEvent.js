@@ -11,6 +11,7 @@ const dd = require("./dd");
 const Boom = require("boom");
 const { v4: uuidv4, v5: uuidv5 } = require("uuid");
 const processPostEvent = require("./processPostEvent").processPostEvent;
+const { isLoggedIn } = require("../common/auth");
 
 const createEventValidator = {
   name: Joi.string().required(),
@@ -21,6 +22,8 @@ const createEventValidator = {
   status: Joi.string().valid("active", "inactive").default("active"),
 };
 module.exports.handler = async (ev) => {
+  const jwt = await isLoggedIn(ev, true);
+  if (!jwt) return lambdaReponse(Boom.unauthorized());
   const teamId = ev.pathParameters.team_id;
   const eventId = ev.pathParameters.event_id;
   const body = JSON.parse(ev.body);

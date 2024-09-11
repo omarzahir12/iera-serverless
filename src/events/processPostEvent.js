@@ -44,6 +44,7 @@ module.exports.processPostEvent = async (event, teamId) => {
           status: "active",
           start: new Date(dates[a]),
           event_length: event.event_length,
+          author: event.author,
         });
       }
       //console.log({ toAdd, dates });
