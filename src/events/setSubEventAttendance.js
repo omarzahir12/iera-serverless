@@ -52,7 +52,7 @@ module.exports.handler = async (event) => {
   const jwt = await isLoggedIn(event, true);
   if (!jwt) {
     console.log({ jwt });
-    return lambdaReponse(Boom.unauthorized);
+    return lambdaReponse(Boom.unauthorized());
   }
   //TODO -- if past event or if report=true then regenerate reports for new user
   await addToSet(
@@ -80,7 +80,7 @@ module.exports.remove = async (event) => {
   const jwt = await isLoggedIn(event);
   if (!jwt) {
     console.log({ jwt });
-    return lambdaReponse(Boom.unauthorized);
+    return lambdaReponse(Boom.unauthorized());
   }
   await removeFromSet(
     collections.sub_events,
@@ -99,13 +99,16 @@ module.exports.setById = async (event) => {
   const user_id = event.pathParameters.user_id;
   const body = JSON.parse(event.body);
   const jwt = await isLoggedIn(event);
-  if (!jwt || (jwt.admins.length === 0 && jwt.type !== "superadmin")) {
+  if (!jwt) {
     console.log({ jwt });
-    return lambdaReponse(Boom.unauthorized);
+    return lambdaReponse(Boom.unauthorized());
+  }
+  if (jwt.type !== "superadmin" && jwt.admins && jwt.admins.length === 0) {
+    return lambdaReponse(Boom.unauthorized());
   }
   const user = await find(collections.users, { _id: user_id });
   if (user.length === 0) {
-    return lambdaReponse(Boom.notFound);
+    return lambdaReponse(Boom.notFound());
   }
   //TODO -- if past event or if report=true then regenerate reports for new user
   await addToSet(
@@ -120,26 +123,32 @@ module.exports.setById = async (event) => {
           first_name: user.first_name,
           last_name: user.last_name,
         },
+        by: jwt._id,
       },
     }
   );
   if (past) {
     await ifPast(jwt, eventId);
   }
-  return lambdaReponse({});
+  const events = await find(collections.sub_events, { _id: eventId });
+  return lambdaReponse(events[0]);
 };
 module.exports.removeById = async (event) => {
   const eventId = event.pathParameters.sub_event_id;
   const user_id = event.pathParameters.user_id;
   const jwt = await isLoggedIn(event);
-  if (!jwt || (jwt.admins.length === 0 && jwt.type !== "superadmin")) {
+  if (!jwt) {
     console.log({ jwt });
-    return lambdaReponse(Boom.unauthorized);
+    return lambdaReponse(Boom.unauthorized());
+  }
+  if (jwt.type !== "superadmin" && jwt.admins && jwt.admins.length === 0) {
+    return lambdaReponse(Boom.unauthorized());
   }
   await removeFromSet(
     collections.sub_events,
     { _id: eventId },
     { attendance: { id: user_id } }
   );
-  return lambdaReponse({});
+  const events = await find(collections.sub_events, { _id: eventId });
+  return lambdaReponse(events[0]);
 };

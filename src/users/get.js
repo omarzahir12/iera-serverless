@@ -44,9 +44,12 @@ module.exports.handler = async (event) => {
       return lambdaReponse(Boom.unauthorized());
     }
 
-    let filter = {
-      groups: { $all: [type] },
-    };
+    let filter =
+      jwt.type === "superadmin" && type === "pending"
+        ? { groups: { $exists: false }, type: { $ne: "superadmin" } }
+        : {
+            groups: { $all: [type] },
+          };
     let teams_filter = null;
     if (team) {
       filter.teams = { $all: [team] };
