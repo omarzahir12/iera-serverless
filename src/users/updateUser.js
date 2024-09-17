@@ -1,3 +1,16 @@
+const fs = require('fs');
+const path = require('path');
+
+const POSTAL_CODE_FILE = path.join(__dirname, '../common/zipcodes_ca.json');
+const postal_data = fs.readFileSync(POSTAL_CODE_FILE, 'utf8');
+
+const postalCodeToCity = JSON.parse(postal_data);
+
+function findCityByPostalCode(postalCode) {
+  const prefix = postalCode.replace(/\s/g, '').slice(0, 3).toUpperCase();
+  return postalCodeToCity[prefix];
+}
+
 const Joi = require("joi");
 const { collections, update, find } = require("../common/mongo");
 const lambdaReponse = require("../common/lambdaResponse").lambdaReponse;
@@ -38,6 +51,11 @@ module.exports.handler = async (event) => {
   if (body._id) delete body._id;
   if (jwt.type !== "superadmin" && userId !== jwt._id) {
     return lambdaReponse(Boom.unauthorized());
+  }
+  if (!body.city && body.postal_code) { //If city not present
+    const matchedCity = findCityByPostalCode(body.postal_code);
+    if (matchedCity)
+      body.city = matchedCity;
   }
   for (let item in body) {
     const key = body[item];
