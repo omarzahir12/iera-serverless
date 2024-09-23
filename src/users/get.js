@@ -79,30 +79,49 @@ module.exports.handler = async (event) => {
           : filter_org
         : non_admin_filter
     );
-    if (type === "newmuslim") {
-      const mentees = await find(collections.users, {
+    if (type === "newmuslim" && jwt.type === "superadmin") {
+      const mentors = await find(collections.users, {
         mentees: { $in: users.map((user) => user._id) },
       });
-      if (mentees.length > 0) {
+      if (mentors.length > 0) {
         for (let user of users) {
           let id = user._id;
-          for (let mentee of mentees) {
-            if (mentee.mentees.indexOf(id) > -1) {
+          for (let mentor of mentors) {
+            if (mentor.mentees.indexOf(id) > -1) {
               if (!user.assigned) {
                 user.assigned = [];
               }
-              user.assigned.push(
-                jwt.type === "superadmin"
-                  ? mentee
-                  : {
-                      _id: mentee._id,
-                      first_name: mentee.first_name,
-                      last_name: mentee.last_name,
-                    }
-              );
+              user.assigned.push({
+                ...mentor,
+                accepted: mentor.accepted_mentees
+                  ? mentor.accepted_mentees.indexOf(id) > -1
+                  : false,
+              });
             }
           }
         }
+      }
+    } else if (type === "newmuslim") {
+      for (let user of users) {
+        if (!user.assigned) {
+          user.assigned = [];
+        }
+        user.assigned.push({
+          _id: jwt._id,
+          first_name: jwt.first_name,
+          last_name: jwt.last_name,
+          accepted: jwt.accepted_mentees
+            ? jwt.accepted_mentees.indexOf(user._id) > -1
+            : false,
+        });
+        console.log({
+          _id: jwt._id,
+          first_name: jwt.first_name,
+          last_name: jwt.last_name,
+          accepted: jwt.accepted_mentees
+            ? jwt.accepted_mentees.indexOf(user._id) > -1
+            : false,
+        });
       }
     }
     return lambdaReponse(cleanUserData(jwt, users));
@@ -126,6 +145,9 @@ module.exports.names = async (event) => {
         users.map((user) => {
           return {
             id: user._id,
+            phone: user.mobile,
+            email: user.email,
+            city: user.city,
             name: user.first_name
               ? user.first_name + " " + user.last_name
               : user.email,

@@ -267,6 +267,18 @@ functions:
       - httpApi:
           path: /notif/events
           method: GET
+  acceptMentee:
+    handler: src/users/acceptMentee.handler
+    events:
+      - httpApi:
+          path: /users/{user_id}/acceptMentee
+          method: PUT
+  rejectMentee:
+    handler: src/users/rejectMentee.handler
+    events:
+      - httpApi:
+          path: /users/{user_id}/rejectMentee
+          method: PUT
   # new_import:
   #   handler: src/common/nm_import.handler
   #   timeout: 300

@@ -75,11 +75,65 @@ module.exports.handler = async (event) => {
           },
         ])
       : null;
+  let count = {};
+  if (jwt.type === "superadmin") {
+    const teams_count = await aggregate(collections.users, [
+      {
+        $unwind: "$teams",
+      },
+      {
+        $group: {
+          _id: "$teams",
+          userCount: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          team: "$_id",
+          userCount: 1,
+        },
+      },
+    ]);
+    const admins_count = await aggregate(collections.users, [
+      {
+        $unwind: "$admins",
+      },
+      {
+        $group: {
+          _id: "$admins",
+          userCount: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          team: "$_id",
+          userCount: 1,
+        },
+      },
+    ]);
+    count = {
+      teams_count,
+      admins_count,
+    };
+  }
+
   return lambdaReponse(
     teams.map((team) => {
       return {
         ...team,
         name: startCase(team._id),
+        teams_count: count.teams_count
+          ? count.teams_count.find((se) => se.team === team._id)?.userCount
+          : 0,
+        admins_count: count.admins_count
+          ? count.admins_count.find((se) => se.team === team._id)?.userCount
+          : 0,
         active_events: sub_events
           ? sub_events.find((se) => se._id === team._id)?.count
           : 0,

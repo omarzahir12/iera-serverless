@@ -106,9 +106,18 @@ const push = async (collection, query, push, upsert) => {
     { returnOriginal: false, upsert }
   );
 };
+const pull = async (collection, query, pull, upsert) => {
+  let col = await getCollection(collection);
+  return await col.findOneAndUpdate(
+    query,
+    { $pull: pull },
+    { returnOriginal: false, upsert }
+  );
+};
 module.exports.update = update;
 module.exports.updatenpush = updatenpush;
 module.exports.push = push;
+module.exports.pull = pull;
 module.exports.addToSet = addToSet;
 module.exports.removeFromSet = removeFromSet;
 
