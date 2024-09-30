@@ -14,7 +14,7 @@ const { v4: uuidv4, v5: uuidv5 } = require("uuid");
 const endpoint = process.env.R2_ENDPOINT;
 const accessKeyId = process.env.R2_ACCESS_ID;
 const secretAccessKey = process.env.R2_ACCESS_SECRET;
-const bucket = process.env.R2_BUCKET;
+const bucket = process.env.R2_BUCKET_REPORTS;
 const S3 = new S3Client({
   endpoint,
   credentials: { accessKeyId, secretAccessKey },
@@ -187,6 +187,55 @@ module.exports.gets = async (event) => {
   console.log({ toSend, reports, query, subEvents, ids, type });
 
   return lambdaReponse(toSend);
+};
+module.exports.publish_to_s3 = async (event) => {
+  const types = ["event_report", "mentor"];
+  let responses = [];
+  for (let type of types) {
+    const status = "submitted";
+    const query = {
+      "reports.status": status,
+      type: type,
+    };
+    const reports = await find(collections.reports, query);
+    let toSend = [];
+    let ids = [];
+    for (let r of reports) {
+      for (let report of r.reports) {
+        toSend.push({
+          ...report,
+          type: r.type,
+          _id: r._id,
+          meta: r.meta ? r.meta : report.meta,
+        });
+        ids.push(r._id);
+      }
+    }
+    const subEvents = keyBy(
+      await find(collections.sub_events, {
+        _id: { $in: ids },
+      }),
+      "_id"
+    );
+    for (let s of toSend) {
+      if (subEvents[s._id]) {
+        s.team = subEvents[s._id].teamId;
+        s.start = subEvents[s._id].start;
+      }
+    }
+    const command = new PutObjectCommand({
+      ACL: ObjectCannedACL.private,
+      Body: JSON.stringify(toSend, null, 2),
+      Bucket: bucket,
+      Key: `${type}.json`,
+      ContentEncoding: "base64",
+      ContentType: "application/json",
+    });
+    const response = await S3.send(command);
+    response;
+    console.log({ response });
+  }
+  return lambdaReponse({ done: true });
 };
 
 module.exports.update = async (event) => {

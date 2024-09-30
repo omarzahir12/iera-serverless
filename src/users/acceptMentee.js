@@ -17,6 +17,26 @@ module.exports.handler = async (event) => {
       { accepted_mentees: menteeId },
       false
     );
+    await push(
+      collections.reports,
+      { _id: menteeId, type: "mentor" },
+      {
+        reports: {
+          id: uuidv4(),
+          meta: "Mentor",
+          created_at: new Date(),
+          mentor_id: jwt._id,
+          status: "pending",
+          submit: null,
+          user: {
+            _id: jwt._id,
+            first_name: jwt.first_name,
+            last_name: jwt.last_name,
+          },
+        },
+      },
+      true
+    );
   }
   //TODO: send email to new muslim stating they have a Mentor they can reach out to
   return lambdaReponse({ _id: menteeId }, 201);

@@ -10,6 +10,7 @@ module.exports.handler = async (event) => {
     return lambdaReponse(Boom.unauthorized());
 
   const menteeId = event.pathParameters.user_id;
+  const reason = event.body?.reason;
   if (!jwt.accepted_mentees || jwt.accepted_mentees.indexOf(menteeId) === -1) {
     await pull(
       collections.users,
@@ -17,6 +18,9 @@ module.exports.handler = async (event) => {
       { mentees: menteeId },
       false
     );
+  }
+  if (reason) {
+    //send email with reacon given
   }
   //TODO: send email to admin stating Mentee has been rejected
   return lambdaReponse({ _id: menteeId }, 201);

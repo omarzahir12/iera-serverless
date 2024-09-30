@@ -12,8 +12,8 @@ provider:
     SENGRID: ${ssm:/sendgrid}
     PRIVATE_KEY: ${ssm:/private_key}
     PUBLIC_KEY: ${ssm:/public_key}
-    R2_ACCESS_ID: ${ssm:/r2_access_id}
-    R2_ACCESS_SECRET: ${ssm:/r2_access_secret}
+    R2_ACCESS_ID: ${ssm:/r2_access_id_prod}
+    R2_ACCESS_SECRET: ${ssm:/r2_access_secret_prod}
     MICROSOFT_ACCESS_TOKEN_ID: ${ssm:/microsoft_access_token_id}
     MICROSOFT_TENANT_ID: ${ssm:/microsoft_tenant_id}
     MICROSOFT_CLIENT_ID: ${ssm:/microsoft_client_id}
@@ -25,6 +25,7 @@ provider:
     SHAREPOINT_NEW_MUSLIM_WEEKLY_TRACKER_LIST_ID: ${ssm:/sharepoint_new_muslim_weekly_tracker_list_id}
     R2_ENDPOINT: https://b9068f786c3dc33c2c4b3cac9a1638cd.r2.cloudflarestorage.com
     R2_BUCKET: iera-canada-ids
+    R2_BUCKET_REPORTS: iera-canada-reports
   
 functions:
   #open
@@ -214,6 +215,10 @@ functions:
       - httpApi:
           path: /gen/reports/events
           method: get
+  publishReportsToS3:
+    handler: src/reports/report_new.publish_to_s3
+    events:
+      - schedule: rate(6 hours)
   generateReportsMentor:
     handler: src/reports/report_new.create_for_mentors
     events:

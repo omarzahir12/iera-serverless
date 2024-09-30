@@ -7,3 +7,4 @@ jspm_packages
 .secrets
 
 deploy.sh
+aws-cli.sh
