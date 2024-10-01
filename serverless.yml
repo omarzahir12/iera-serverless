@@ -6,6 +6,7 @@ provider:
   runtime: nodejs18.x
   region: ca-central-1
   stage: ${opt:stage, 'dev'}
+  timeout: 30
   memorySize: 128
   environment:
     MONGO_URI: ${ssm:/mongo_db}
@@ -272,6 +273,12 @@ functions:
       - httpApi:
           path: /notif/events
           method: GET
+  assignMentors:
+    handler: src/users/assignMentors.handler
+    events:
+      - httpApi:
+          path: /users/{user_id}/assignMentors
+          method: PUT
   acceptMentee:
     handler: src/users/acceptMentee.handler
     events:

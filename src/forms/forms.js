@@ -21,6 +21,6 @@ module.exports.getTemplate = async (event) => {
     const template = templates[0];
     return lambdaReponse(template.form);
   } else {
-    return lambdaReponse(Boom.notFound());
+    return lambdaReponse([]);
   }
 };

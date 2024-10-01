@@ -27,6 +27,7 @@ module.exports.handler = async (event) => {
   let type = event.queryStringParameters
     ? event.queryStringParameters.type
     : "volunteer";
+  let sub_groups = event.queryStringParameters?.sub_groups;
   if (ALIAS[type]) {
     type = ALIAS[type];
   }
@@ -47,6 +48,11 @@ module.exports.handler = async (event) => {
     let filter =
       jwt.type === "superadmin" && type === "pending"
         ? { groups: { $exists: false }, type: { $ne: "superadmin" } }
+        : sub_groups
+        ? {
+            groups: { $all: [type] },
+            sub_groups: { $all: [sub_groups] },
+          }
         : {
             groups: { $all: [type] },
           };
