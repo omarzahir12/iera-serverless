@@ -9,7 +9,7 @@ module.exports.handler = async (event) => {
   if (jwt.type !== "superadmin") return lambdaReponse(Boom.unauthorized());
   const body = event.body ? JSON.parse(event.body) : {};
   const mentors = body?.mentors || [];
-  const old_mentors = body?.old_mentors || [];
+  const old_mentors = body?.orig_mentors || [];
   // Find items that are in both lists
   const commonItems = mentors.filter((mentor) => old_mentors.includes(mentor));
 
@@ -20,7 +20,7 @@ module.exports.handler = async (event) => {
   const to_remove = old_mentors.filter(
     (oldMentor) => !mentors.includes(oldMentor)
   );
-
+  console.log({ mentors, old_mentors, to_add, to_remove });
   const menteeId = event.pathParameters.user_id;
   console.log({ mentors, menteeId, body: body });
   for (let mentor of to_add) {
