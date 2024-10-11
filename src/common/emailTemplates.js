@@ -148,4 +148,25 @@ module.exports = {
     ],
     template_id: "d-bca8f89f9a6f47d4a8ce57cb249c0287",
   },
+  mentorAssignment: {
+    from: {
+      email: "no-reply@iera.ca",
+      name: "iERA",
+    },
+    personalizations: [
+      {
+        to: [
+          {
+            email: "", // Will be set dynamically
+          },
+        ],
+        dynamic_template_data: {
+          mentorname: "",
+          menteename: "",
+          menteedetails: "",
+          },
+      },
+    ],
+    template_id: "d-77758d8b5e614366b01d01ef534e37f1", // Replace with actual template ID
+  },
 };

@@ -32,3 +32,13 @@ module.exports.newVolunteerAdded = async (data) => {
   template.personalizations[0].dynamic_template_data = data;
   await sgMail.send(template);
 };
+module.exports.sendMentorAssignment = async (mentorEmail, mentorName, menteeName, menteeDetails) => {
+  const template = { ...templates.mentorAssignment };
+  template.personalizations[0].to[0].email = mentorEmail;
+  template.personalizations[0].dynamic_template_data = {
+    mentorname: mentorName,
+    menteename: menteeName,
+    menteedetails: menteeDetails,
+  };
+  await sgMail.send(template);
+};

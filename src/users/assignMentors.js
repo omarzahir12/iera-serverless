@@ -1,6 +1,7 @@
-const { collections, push, pull } = require("../common/mongo");
+const { find, collections, push, pull } = require("../common/mongo");
 const lambdaReponse = require("../common/lambdaResponse").lambdaReponse;
 const Boom = require("boom");
+const { sendMentorAssignment } = require("../common/email");
 
 const { isLoggedIn } = require("../common/auth");
 
@@ -23,18 +24,48 @@ module.exports.handler = async (event) => {
   console.log({ mentors, old_mentors, to_add, to_remove });
   const menteeId = event.pathParameters.user_id;
   console.log({ mentors, menteeId, body: body });
-  for (let mentor of to_add) {
+  
+  //Get Mentee details
+  const mentee = (await find(collections.users, { _id: menteeId }))[0];
+  if (!mentee) return lambdaReponse(Boom.notFound("Mentee not found"));
+  
+  for (let mentorId of to_add) {
+    //Add to Database
     await push(
       collections.users,
-      { _id: mentor },
+      { _id: mentorId },
       { mentees: menteeId },
       false
     );
+
+    //Get Mentor details
+    const mentor = (await find(collections.users, { _id: mentorId }))[0];
+    if (!mentor) return lambdaReponse(Boom.notFound("Mentor not found"));
+    
+    //Obtain Mentor Details
+    if (mentor){
+      const menteeDetails = `
+      Name: ${mentee.first_name} ${mentee.last_name}<br>
+      Email: ${mentee.email}<br>
+      Phone: ${mentee.phone || 'Not provided'}<br>
+      Location: ${mentee.location || 'Not provided'}<br>
+      Previous Religion: ${mentee.previous_religion || 'Not provided'}<br>
+      Gender: ${mentee.gender || 'Not provided'}<br>
+      `.trim();
+      
+      //Send Email
+      await sendMentorAssignment(
+        mentor.email,
+        mentor.first_name,
+        `${mentee.first_name} ${mentee.last_name}`,
+        menteeDetails,
+      );
+    }
   }
-  for (let mentor of to_remove) {
+  for (let mentorId of to_remove) {
     await pull(
       collections.users,
-      { _id: mentor },
+      { _id: mentorId },
       { mentees: menteeId },
       false
     );
