@@ -157,7 +157,7 @@ module.exports = {
       {
         to: [
           {
-            email: "", // Will be set dynamically
+            email: "",
           },
         ],
         dynamic_template_data: {
@@ -167,7 +167,7 @@ module.exports = {
           },
       },
     ],
-    template_id: "d-77758d8b5e614366b01d01ef534e37f1", // Replace with actual template ID
+    template_id: "d-77758d8b5e614366b01d01ef534e37f1",
   },
   menteeAcceptance: {
     from: {
@@ -249,6 +249,6 @@ module.exports = {
           },
       },
     ],
-    template_id: "",
+    template_id: "d-5e9535119a2c43b9948f6af0df684713",
   },
 };
