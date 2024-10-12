@@ -224,9 +224,9 @@ module.exports = {
           },
         ],
         dynamic_template_data: {
-          menteename: "",
           mentordetails: "",
           menteedetails: "",
+          reason: "",
           },
       },
     ],

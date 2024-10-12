@@ -52,3 +52,12 @@ module.exports.sendMenteeAcceptance = async (menteeEmail, mentorEmail, menteeNam
   };
   await sgMail.send(template);
 };
+module.exports.sendMenteeRejection = async (menteeDetails, mentorDetails, reason) => {
+  const template = { ...templates.menteeRejection };
+  template.personalizations[0].dynamic_template_data = {
+    mentordetails: mentorDetails,
+    menteedetails: menteeDetails,
+    reason: reason, 
+  };
+  await sgMail.send(template);
+};
