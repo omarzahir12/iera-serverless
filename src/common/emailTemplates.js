@@ -169,4 +169,67 @@ module.exports = {
     ],
     template_id: "d-77758d8b5e614366b01d01ef534e37f1", // Replace with actual template ID
   },
+  menteeAcceptance: {
+    from: {
+      email: "no-reply@iera.ca",
+      name: "iERA",
+    },
+    personalizations: [
+      {
+        to: [
+          {
+            email: "",
+          },
+        ],
+        cc: [
+          {
+            email: "",
+          },
+          {
+            email: "o.zahir@iera.ca",
+          },
+        ],
+        dynamic_template_data: {
+          menteename: "",
+          mentordetails: "",
+          },
+      },
+    ],
+    template_id: "d-9df75504a7de48cdb07ee2ae26136357",
+  },
+  menteeRejection: {
+    from: {
+      email: "no-reply@iera.ca",
+      name: "iERA",
+    },
+    personalizations: [
+      {
+        to: [
+          {
+            email: "admin@iera.ca",
+          },
+          {
+            email: "ausman@iera.ca",
+          },
+          {
+            email: "volunteer.manager@iera.ca",
+          },
+          {
+            email: "jeneva.blanco@iera.ca",
+          },
+        ],
+        cc: [
+          {
+            email: "o.zahir@iera.ca",
+          },
+        ],
+        dynamic_template_data: {
+          menteename: "",
+          mentordetails: "",
+          menteedetails: "",
+          },
+      },
+    ],
+    template_id: "d-58eb5522631d408a89e80113ac768f50",
+  },
 };
