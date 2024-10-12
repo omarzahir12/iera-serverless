@@ -1,4 +1,4 @@
-const { volRefused } = require("./email");
+const { volRefused, sendWelcomeNewMuslim } = require("./email");
 
 module.exports = {
   token: {
@@ -231,5 +231,24 @@ module.exports = {
       },
     ],
     template_id: "d-58eb5522631d408a89e80113ac768f50",
+  },
+  welcomeNewMuslim: {
+    from: {
+      email: "no-reply@iera.ca",
+      name: "iERA",
+    },
+    personalizations: [
+      {
+        to: [
+          {
+            email: "",
+          },
+        ],
+        dynamic_template_data: {
+          newMuslimName: "",
+          },
+      },
+    ],
+    template_id: "",
   },
 };

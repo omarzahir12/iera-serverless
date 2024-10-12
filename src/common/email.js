@@ -61,3 +61,11 @@ module.exports.sendMenteeRejection = async (menteeDetails, mentorDetails, reason
   };
   await sgMail.send(template);
 };
+module.exports.sendWelcomeNewMuslim = async (newMuslimEmail, newMuslimName) => {
+  const template = { ...templates.welcomeNewMuslim };
+  template.personalizations[0].to[0].email = newMuslimEmail;
+  template.personalizations[0].dynamic_template_data = {
+    newMuslimName: newMuslimName,
+  };
+  await sgMail.send(template);
+};
