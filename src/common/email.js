@@ -42,10 +42,9 @@ module.exports.sendMentorAssignment = async (mentorEmail, mentorName, menteeName
   };
   await sgMail.send(template);
 };
-module.exports.sendMenteeAcceptance = async (menteeEmail, mentorEmail, menteeName, mentorDetails) => {
+module.exports.sendMenteeAcceptance = async (menteeEmail, menteeName, mentorDetails) => {
   const template = { ...templates.menteeAcceptance };
   template.personalizations[0].to[0].email = menteeEmail;
-  template.personalizations[0].cc[0].email = mentorEmail;
   template.personalizations[0].dynamic_template_data = {
     menteename: menteeName,
     mentordetails: mentorDetails,
@@ -61,11 +60,11 @@ module.exports.sendMenteeRejection = async (menteeDetails, mentorDetails, reason
   };
   await sgMail.send(template);
 };
-module.exports.sendWelcomeNewMuslim = async (newMuslimEmail, newMuslimName) => {
-  const template = { ...templates.welcomeNewMuslim };
-  template.personalizations[0].to[0].email = newMuslimEmail;
-  template.personalizations[0].dynamic_template_data = {
-    newMuslimName: newMuslimName,
-  };
-  await sgMail.send(template);
-};
+// module.exports.sendWelcomeNewMuslim = async (newMuslimEmail, newMuslimName) => {
+//   const template = { ...templates.welcomeNewMuslim };
+//   template.personalizations[0].to[0].email = newMuslimEmail;
+//   template.personalizations[0].dynamic_template_data = {
+//     newMuslimName: newMuslimName,
+//   };
+//   await sgMail.send(template);
+// };

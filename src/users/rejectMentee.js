@@ -1,4 +1,4 @@
-const { collections, update, push, pull } = require("../common/mongo");
+const { find, collections, update, push, pull } = require("../common/mongo");
 const lambdaReponse = require("../common/lambdaResponse").lambdaReponse;
 const Boom = require("boom");
 const { sendMenteeRejection } = require("../common/email");
@@ -7,11 +7,24 @@ const { isLoggedIn } = require("../common/auth");
 
 module.exports.handler = async (event) => {
   const jwt = await isLoggedIn(event, true);
+  console.log("Check1");
   if (!jwt || jwt.type === "superadmin")
     return lambdaReponse(Boom.unauthorized());
-
   const menteeId = event.pathParameters.user_id;
-  const reason = event.body?.reason;
+  let body;
+  //Parse for string
+  if (typeof event.body === 'string') {
+    try {
+      body = JSON.parse(event.body);
+    } catch (err) {
+      console.error('Failed to parse event body:', err);
+      return lambdaReponse(Boom.badRequest("Invalid request body"));
+    }
+  } else {
+    body = event.body;
+  }
+  const reason = body?.reason;
+  //const reason = event.body?.reason;
   if (!jwt.accepted_mentees || jwt.accepted_mentees.indexOf(menteeId) === -1) {
     await pull(
       collections.users,
@@ -21,6 +34,7 @@ module.exports.handler = async (event) => {
     );
   }
   if (reason) {
+    console.log({ menteeId, reason });
     //Get Mentee object
     const mentee = (await find(collections.users, { _id: menteeId }))[0];
     if (!mentee) return lambdaReponse(Boom.notFound("Mentor not found"));
@@ -44,12 +58,16 @@ module.exports.handler = async (event) => {
     Gender: ${jwt.gender || 'Not provided'}<br>
     `.trim();
     
+    console.log("Sending email");
+
     //Send Email
     await sendMenteeRejection(
       menteeDetails,
       mentorDetails,
       reason,
     );
+
+    console.log("Email sent");
   }
   //TODO: send email to admin stating Mentee has been rejected
   return lambdaReponse({ _id: menteeId }, 201);

@@ -183,9 +183,6 @@ module.exports = {
         ],
         cc: [
           {
-            email: "",
-          },
-          {
             email: "o.zahir@iera.ca",
           },
         ],
@@ -232,23 +229,23 @@ module.exports = {
     ],
     template_id: "d-58eb5522631d408a89e80113ac768f50",
   },
-  welcomeNewMuslim: {
-    from: {
-      email: "no-reply@iera.ca",
-      name: "iERA",
-    },
-    personalizations: [
-      {
-        to: [
-          {
-            email: "",
-          },
-        ],
-        dynamic_template_data: {
-          newMuslimName: "",
-          },
-      },
-    ],
-    template_id: "d-5e9535119a2c43b9948f6af0df684713",
-  },
+  // welcomeNewMuslim: {
+  //   from: {
+  //     email: "no-reply@iera.ca",
+  //     name: "iERA",
+  //   },
+  //   personalizations: [
+  //     {
+  //       to: [
+  //         {
+  //           email: "",
+  //         },
+  //       ],
+  //       dynamic_template_data: {
+  //         newMuslimName: "",
+  //         },
+  //     },
+  //   ],
+  //   template_id: "d-5e9535119a2c43b9948f6af0df684713",
+  // },
 };

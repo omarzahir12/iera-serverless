@@ -163,7 +163,7 @@ module.exports.handler = async (event) => {
       who: "Self Registration",
       type: "Self Registration",
     });
-    await sendWelcomeNewMuslim(jwt.email, body.first_name);
+    //await sendWelcomeNewMuslim(jwt.email, body.first_name);
   }
   return lambdaReponse({ _id: userId, ...body }, 201);
 };

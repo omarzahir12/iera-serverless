@@ -10,7 +10,7 @@ const Boom = require("boom");
 const { v4: uuidv4, v5: uuidv5 } = require("uuid");
 const { isLoggedIn } = require("../common/auth");
 const { newMuslimAdded } = require("../common/email");
-const { sendWelcomeNewMuslim } = require("../common/email");
+//const { sendWelcomeNewMuslim } = require("../common/email");
 
 module.exports.handler = async (event) => {
   const body = JSON.parse(event.body);
@@ -41,7 +41,7 @@ module.exports.handler = async (event) => {
           jwt.last_name +
           (jwt.type === "org" ? "(Organization)" : "(Volunteer)"),
       });
-      await sendWelcomeNewMuslim(email, body.first_name);
+      //await sendWelcomeNewMuslim(email, body.first_name);
       return lambdaReponse({ status: "inserted" });
     } catch (e) {
       return lambdaReponse(Boom.notAcceptable("email is already registered"));
