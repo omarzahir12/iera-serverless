@@ -42,15 +42,12 @@ module.exports.handler = async (event) => {
     
     //Get Mentee object
     const mentee = (await find(collections.users, { _id: menteeId }))[0];
-    if (!mentee) return lambdaReponse(Boom.notFound("Mentor not found"));
 
     //Collect Mentor Details
     const mentorDetails = `
     Name: ${jwt.first_name} ${jwt.last_name}<br>
     Email: ${jwt.email}<br>
     Phone: ${jwt.phone || 'Not provided'}<br>
-    City: ${jwt.city || 'Not provided'}<br>
-    Gender: ${jwt.gender || 'Not provided'}<br>
     `.trim();
     
     //Send Email

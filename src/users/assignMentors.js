@@ -27,7 +27,6 @@ module.exports.handler = async (event) => {
   
   //Get Mentee details
   const mentee = (await find(collections.users, { _id: menteeId }))[0];
-  if (!mentee) return lambdaReponse(Boom.notFound("Mentee not found"));
   
   for (let mentorId of to_add) {
     //Add to Database
@@ -40,27 +39,23 @@ module.exports.handler = async (event) => {
 
     //Get Mentor details
     const mentor = (await find(collections.users, { _id: mentorId }))[0];
-    if (!mentor) return lambdaReponse(Boom.notFound("Mentor not found"));
     
-    //Obtain Mentor Details
-    if (mentor){
-      const menteeDetails = `
-      Name: ${mentee.first_name} ${mentee.last_name}<br>
-      Email: ${mentee.email}<br>
-      Phone: ${mentee.phone || 'Not provided'}<br>
-      Location: ${mentee.location || 'Not provided'}<br>
-      Previous Religion: ${mentee.previous_religion || 'Not provided'}<br>
-      Gender: ${mentee.gender || 'Not provided'}<br>
-      `.trim();
-      
-      //Send Email
-      await sendMentorAssignment(
-        mentor.email,
-        mentor.first_name,
-        `${mentee.first_name} ${mentee.last_name}`,
-        menteeDetails,
-      );
-    }
+    //Obtain Mentee Details
+    const menteeDetails = `
+    Name: ${mentee.first_name} ${mentee.last_name}<br>
+    Email: ${mentee.email}<br>
+    Phone: ${mentee.phone || 'Not provided'}<br>
+    Location: ${mentee.location || 'Not provided'}<br>
+    Previous Religion: ${mentee.previous_religion || 'Not provided'}<br>
+    `.trim();
+    
+    //Send Email
+    await sendMentorAssignment(
+      mentor.email,
+      mentor.first_name,
+      `${mentee.first_name} ${mentee.last_name}`,
+      menteeDetails,
+    );
   }
   for (let mentorId of to_remove) {
     await pull(

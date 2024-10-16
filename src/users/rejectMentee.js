@@ -7,22 +7,11 @@ const { isLoggedIn } = require("../common/auth");
 
 module.exports.handler = async (event) => {
   const jwt = await isLoggedIn(event, true);
-  console.log("Check1");
   if (!jwt || jwt.type === "superadmin")
     return lambdaReponse(Boom.unauthorized());
   const menteeId = event.pathParameters.user_id;
-  let body;
+  let body = JSON.parse(event.body);
   //Parse for string
-  if (typeof event.body === 'string') {
-    try {
-      body = JSON.parse(event.body);
-    } catch (err) {
-      console.error('Failed to parse event body:', err);
-      return lambdaReponse(Boom.badRequest("Invalid request body"));
-    }
-  } else {
-    body = event.body;
-  }
   const reason = body?.reason;
   //const reason = event.body?.reason;
   if (!jwt.accepted_mentees || jwt.accepted_mentees.indexOf(menteeId) === -1) {
@@ -37,7 +26,6 @@ module.exports.handler = async (event) => {
     console.log({ menteeId, reason });
     //Get Mentee object
     const mentee = (await find(collections.users, { _id: menteeId }))[0];
-    if (!mentee) return lambdaReponse(Boom.notFound("Mentor not found"));
 
     //Collect Mentee Details
     const menteeDetails = `
@@ -46,7 +34,6 @@ module.exports.handler = async (event) => {
     Phone: ${mentee.phone || 'Not provided'}<br>
     Location: ${mentee.location || 'Not provided'}<br>
     Previous Religion: ${mentee.previous_religion || 'Not provided'}<br>
-    Gender: ${mentee.gender || 'Not provided'}<br>
     `.trim();
 
     //Collect Mentor Details
@@ -55,7 +42,6 @@ module.exports.handler = async (event) => {
     Email: ${jwt.email}<br>
     Phone: ${jwt.phone || 'Not provided'}<br>
     City: ${jwt.city || 'Not provided'}<br>
-    Gender: ${jwt.gender || 'Not provided'}<br>
     `.trim();
     
     console.log("Sending email");
