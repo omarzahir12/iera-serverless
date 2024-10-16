@@ -1,4 +1,6 @@
 const sgMail = require("@sendgrid/mail");
+const fs = require("fs");
+const path = require("path");
 sgMail.setApiKey(process.env.SENGRID);
 const templates = require("./emailTemplates");
 module.exports.sendToken = async (token, to) => {
@@ -49,6 +51,17 @@ module.exports.sendMenteeAcceptance = async (menteeEmail, menteeName, mentorDeta
     menteename: menteeName,
     mentordetails: mentorDetails,
   };
+  const filePath = path.join(__dirname, 'New Muslim Success HandBook.pdf');
+  console.log(filePath);
+  const fileData = fs.readFileSync(filePath).toString('base64');
+  template.attachments = [
+    {
+      content: fileData,
+      filename: "New Muslim Success HandBook.pdf",
+      type: "application/pdf",
+      disposition: "attachment",
+    },
+  ];
   await sgMail.send(template);
 };
 module.exports.sendMenteeRejection = async (menteeDetails, mentorDetails, reason) => {
