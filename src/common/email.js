@@ -44,21 +44,31 @@ module.exports.sendMentorAssignment = async (mentorEmail, mentorName, menteeName
   };
   await sgMail.send(template);
 };
-module.exports.sendMenteeAcceptance = async (menteeEmail, menteeName, mentorDetails) => {
+module.exports.sendMenteeAcceptance = async (menteeEmail, menteeName, mentorDetails, menteeGender) => {
   const template = { ...templates.menteeAcceptance };
   template.personalizations[0].to[0].email = menteeEmail;
   template.personalizations[0].dynamic_template_data = {
     menteename: menteeName,
     mentordetails: mentorDetails,
   };
-  const filePath = path.join(__dirname, 'New Muslim Success HandBook.pdf');
-  console.log(filePath);
-  const fileData = fs.readFileSync(filePath).toString('base64');
+  const filePath_handbook = path.join(__dirname, 'New Muslim Success HandBook.pdf');
+  console.log(filePath_handbook);
+  const fileData_handbook = fs.readFileSync(filePath_handbook).toString('base64');
+  console.log(menteeGender);
+  const filePath_qrc = (menteeGender === "male" ? path.join(__dirname, 'NM_Brothers_QRC_Whatsapp.jpg') : path.join(__dirname, 'NM_Sisters_QRC_Whatsapp.jpg'));
+  console.log(filePath_qrc);
+  const fileData_qrc = fs.readFileSync(filePath_qrc).toString('base64');
   template.attachments = [
     {
-      content: fileData,
+      content: fileData_handbook,
       filename: "New Muslim Success HandBook.pdf",
       type: "application/pdf",
+      disposition: "attachment",
+    },
+    {
+      content: fileData_qrc,
+      filename: "Whatsapp_Group_QRCode.pdf",
+      type: "image/jpeg",
       disposition: "attachment",
     },
   ];

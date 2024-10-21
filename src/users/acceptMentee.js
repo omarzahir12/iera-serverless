@@ -55,6 +55,7 @@ module.exports.handler = async (event) => {
       mentee.email,
       mentee.first_name,
       mentorDetails,
+      mentee.gender,
     );
   }
   //TODO: send email to new muslim stating they have a Mentor they can reach out to
